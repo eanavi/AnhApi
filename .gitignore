@@ -1,0 +1,69 @@
+#--------------------------------
+# Archivos de la solución de Visual Studio
+#--------------------------------
+*.suo
+*.user
+*.useros
+*.sln.docstates
+
+# Carpeta de configuraciones de usuario de la solución
+.vs/
+
+# Directorios de artefactos de compilación y temporales
+[Dd]ebug/
+[Rr]elease/
+[Aa]rm64/
+[Aa]rm/
+x64/
+x86/
+
+# Binarios de la aplicación
+[Bb]in/
+[Oo]bj/
+[Ww]wwroot/
+!.gitkeep
+
+# Paquetes NuGet
+*.nupkg
+[Pp]ackages/
+
+# Cache de paquetes NuGet global
+# .nuget/packages/
+
+#--------------------------------
+# Archivos de Visual Studio Code
+#--------------------------------
+# Directorio de configuraciones del espacio de trabajo
+# Nota: La mayoría de las veces es útil compartir settings.json,
+# pero otros archivos como launch.json son personales.
+# Puedes descomentar la línea de abajo si no quieres compartir NINGUNA configuración.
+# .vscode/
+.vscode/tasks.json
+.vscode/launch.json
+.vscode/settings.json
+
+# Archivos de logs y crash dumps
+*.log
+*.pdb
+*.dll
+*.exe
+
+#--------------------------------
+# Archivos del sistema operativo y misceláneos
+#--------------------------------
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+
+# Configuración de Rider (JetBrains)
+.idea/
+*.DotSettings.user
+
+# Certificados de desarrollo de ASP.NET
+# No es recomendable subir certificados a un repositorio público
+*.pfx
+
+#archivos de entorno de variables
+.env

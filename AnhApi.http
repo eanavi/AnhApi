@@ -1,0 +1,6 @@
+@AnhApi_HostAddress = http://localhost:5263
+
+GET {{AnhApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
