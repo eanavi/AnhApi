@@ -1,15 +1,16 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿// Antes (la definición de tu interfaz)
+// public interface IGenericoServicio<T, TDto, TId>
 
-namespace AnhApi.Servicios
+// Después (la definición CORREGIDA de tu interfaz)
+using AnhApi.Modelos;
+
+public interface IGenericoServicio<T, TId>
+    where T : ModeloBase
 {
-    public interface IGenericoServicio<TEntity, TDto, TId> where TEntity : class where TDto : class
-    {
-        Task<IEnumerable<TDto>> ObtenerTodosAsync();
-        Task<TDto?> ObtenerPorIdAsync(TId id);
-        Task<TDto> CrearAsync(TDto dto);
-        Task<bool> ActualizarAsync(TDto dto);
-        Task<bool> EliminarAsync(TId id);
-        Task<TDto?> EliminarFisicoAsync(TId id);
-    }
+    Task<IEnumerable<T>> ObtenerTodosAsync();
+    Task<T?> ObtenerPorIdAsync(TId id);
+    Task<T> CrearAsync(T entidad, string usuario, string ip);
+    Task<bool> ActualizarAsync(TId id, T entidad, string usuario, string ip);
+    Task<bool> EliminarAsync(TId id, string usuario, string ip);
+    Task<T?> EliminarFisicoAsync(TId id);
 }

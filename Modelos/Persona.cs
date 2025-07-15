@@ -11,6 +11,7 @@ namespace AnhApi.Modelos
         public DateTime fecha_nacimiento { get; set; }
         public string numero_identificacion { get; set; } = null!;
         public string? complemento { get; set; }
+        public int genero { get; set; } = 0; // -1: No especificado, 1: Masculino, 0: Femenino
         public JsonDocument? direccion { get; set; }
         public JsonDocument? telefono { get; set; }
         public JsonDocument? correo { get; set; }

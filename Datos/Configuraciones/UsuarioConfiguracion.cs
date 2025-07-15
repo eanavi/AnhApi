@@ -40,7 +40,6 @@ namespace AnhApi.Datos.Configuraciones
                   .IsRequired(); // varchar(100) NOT NULL
 
             // Configuración de las propiedades heredadas de ModeloBase
-            // Coincidiendo con la DDL de PostgreSQL:
             entity.Property(e => e.aud_estado)
                   .HasColumnName("aud_estado")
                   .IsRequired(true); // int4 NULL

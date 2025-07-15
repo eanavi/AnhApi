@@ -1,4 +1,4 @@
-using EsqPersona = AnhApi.Esquemas.Persona;
+using EsqPersona = AnhApi.Esquemas.PersonaEsq;
 using AnhApi.Mapeos; // Ajustado para MappingProfile
 using AnhApi.Modelos;
 using AnhApi.Nucleo;
@@ -8,6 +8,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Serilog;
+using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 
 DotNetEnv.Env.Load();
 var entorno = Environment.GetEnvironmentVariable("ENTORNO_ASPNETCORE");
@@ -15,6 +17,14 @@ if (!string.IsNullOrWhiteSpace(entorno))
 {
     Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", entorno);
 }
+
+var configuracionLogger = new LoggerConfiguration()
+    .MinimumLevel.Debug()
+    .Enrich.FromLogContext()
+    .Enrich.WithProperty("ApplicationName", "AnhApi")
+    .Enrich.WithProperty("MchineName", Environment.MachineName)
+    .Enrich.WithProperty("ProcessId", Environment.ProcessId)
+    .Enrich.WithProperty("TreadId", Environment.CurrentManagedThreadId);
 
 // Opciones del Servidor
 var builder = WebApplication.CreateBuilder(args);
@@ -24,6 +34,20 @@ builder.Configuration
     .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
     .AddJsonFile($"appsettings.{entorno}.json", optional: true, reloadOnChange: true)
     .AddEnvironmentVariables();
+
+if (builder.Environment.IsDevelopment())
+{
+    configuracionLogger.WriteTo.Console();
+}
+else
+{
+    configuracionLogger.WriteTo.File(
+        path: Path.Combine("logs", "Api-log-.txt"),
+        rollingInterval: RollingInterval.Day,
+        outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss} [{Level:u3}] {Message:lj}{NewLine}{Exception}");
+}
+
+Log.Logger = configuracionLogger.CreateLogger();
 
 // Configuración de la base de datos
 builder.Services.Configure<BdPostgres>(builder.Configuration.GetSection("BDPosgres"));
@@ -42,15 +66,17 @@ builder.Services.AddDbContext<AnhApi.Datos.AppDbContext>((serviceProvider, optio
 // Configurar AutoMapper
 builder.Services.AddAutoMapper(typeof(Program).Assembly);
 
-// Registrar el servicio genérico con el DTO EsqPersona
-builder.Services.AddScoped<IGenericoServicio<Persona, EsqPersona, Guid>, PersonaServicio>();
+// Registrar el servicio genérico 
+builder.Services.AddScoped(typeof(IGenericoServicio<, >), typeof(GenericoServicio<,>));
+builder.Services.AddScoped<AnhApi.Servicios.ParametroServicio>(); //Registrar servicio específico de Parámetro no hereda de GenericoServicio
 
 // Adicionar servicios al contenedor
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
-        options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+        options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower;
         options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+        options.JsonSerializerOptions.Converters.Add(new JsonDateTimeConverter());
     });
 
 // Configurar Swagger/OpenAPI

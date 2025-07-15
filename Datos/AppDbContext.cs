@@ -10,6 +10,7 @@ namespace AnhApi.Datos
 
         public DbSet<Persona> Personas { get; set; }
         public DbSet<Usuario> Usuarios { get; set; }
+        public DbSet<Parametro> Parametros { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

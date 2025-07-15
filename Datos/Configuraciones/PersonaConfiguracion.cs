@@ -50,6 +50,10 @@ namespace AnhApi.Datos.Configuraciones
                   .HasColumnName("complemento")
                   .HasMaxLength(10);
 
+            entity.Property(e => e.genero)
+                  .HasColumnName("genero")
+                  .HasColumnType("int4");
+
             entity.Property(e => e.direccion)
                   .HasColumnName("direccion")
                   .HasColumnType("jsonb");
