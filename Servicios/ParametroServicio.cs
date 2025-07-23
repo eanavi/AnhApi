@@ -52,6 +52,39 @@ namespace AnhApi.Servicios
             }
         }
 
+        public async Task<PaginacionResultado<Parametro>> ObtenerTodosPagAsync(PaginacionParametros paginacion)
+        {
+            try
+            {
+                if (paginacion == null)
+                {
+                    paginacion = new PaginacionParametros(); // Asigna valores por defecto si es nulo
+                }
+
+                IQueryable<Parametro> query = _context.Set<Parametro>().AsQueryable();
+
+                query = query.Where(e => e.aud_estado == 0);
+                var totalRegistros = await query.CountAsync();
+                var resultado = await query
+                    .Skip(paginacion.ElementosAOmitir)
+                    .Take(paginacion.TamanoPagina)
+                    .ToListAsync();
+                return new PaginacionResultado<Parametro>
+                {
+                    Elementos = resultado,
+                    TotalRegistros = totalRegistros,
+                    PaginaActual = paginacion.PaginaNumero,
+                    TamanoPagina = paginacion.TamanoPagina,
+                    TotalPaginas = (int)Math.Ceiling((double)totalRegistros / paginacion.TamanoPagina)
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al obtener los registros de Parametro con paginación.");
+                throw; // Rethrow the exception after logging
+            }
+        }
+
         /// <summary>
         /// Obtener un registro en particular para lo cual se debe conocer el nombre
         /// </summary>

@@ -41,21 +41,32 @@ namespace AnhApi.Controladores
         /// </summary>
         /// <returns>Una lista de PersonaListado.</returns>
         [HttpGet] // Ruta: GET api/personas
-        [ProducesResponseType(typeof(IEnumerable<PersonaListado>), 200)] // Indica el tipo de retorno esperado
+        [ProducesResponseType(typeof(PaginacionResultado<PersonaListado>), 200)] // Indica el tipo de retorno esperado
+        [ProducesResponseType(400)]//Paginacion erronea
+        [ProducesResponseType(401)]//No autorizado
         [ProducesResponseType(500)]
-        public async Task<ActionResult<IEnumerable<PersonaListado>>> ObtenerTodasPersonas()
+        public async Task<ActionResult<PaginacionResultado<PersonaListado>>> ObtenerTodasPersonas(
+            [FromQuery]PaginacionParametros parametros)
         {
             try
             {
-                var personas = await _personaServ.ObtenerTodosAsync();
-                if (personas == null)
+                if (!ModelState.IsValid)
                 {
-                    // Aunque el servicio debería devolver una colección vacía si no hay nada,
-                    return Ok(new List<PersonaListado>()); // Devolver una lista vacía en lugar de NotFound para "todos"
+                    return BadRequest(ModelState);
                 }
-                // Mapear la colección de modelos a la colección de DTOs de listado
-                var personasListado = _mapper.Map<IEnumerable<PersonaListado>>(personas);
-                return Ok(personasListado);
+
+                var personasPag = await _personaServ.ObtenerTodosPagAsync(parametros);
+                var personasList = _mapper.Map<IEnumerable<PersonaListado>>(personasPag.Elementos);
+
+                var resultado = new PaginacionResultado<PersonaListado>
+                {
+                    Elementos = personasList,
+                    TotalRegistros = personasPag.TotalRegistros,
+                    PaginaActual = personasPag.PaginaActual,
+                    TamanoPagina = personasPag.TamanoPagina,
+                    TotalPaginas = personasPag.TotalPaginas
+                };
+                return Ok(resultado);
             }
             catch (Exception ex)
             {
@@ -73,25 +84,30 @@ namespace AnhApi.Controladores
         /// carnet de identidad que son numeros
         /// fecha de nacimiento en formato dd-mm-yyyy para no confundir al enrutador</param>
         /// <returns>lista de Personas</returns>
-        [HttpGet("buscar/{criterio}")]
-        [ProducesResponseType(typeof(IEnumerable<PersonaListado>), 200)]
+        [HttpGet("buscar")] // Ruta: GET api/personas/buscar?criterio=...&PaginaNumero=...&TamanoPagina=...
+        [ProducesResponseType(typeof(PaginacionResultado<PersonaListado>), 200)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(401)]
         [ProducesResponseType(500)]
-        public async Task<ActionResult<IEnumerable<PersonaListado>>> BuscarPersonas(string criterio)
+        public async Task<ActionResult<PaginacionResultado<PersonaListado>>> BuscarPaginado(
+            [FromQuery] string? criterio, // Criterio de búsqueda, puede ser opcional
+            [FromQuery] PaginacionParametros parametrosPaginacion)
         {
             try
             {
-                var personas = await _personaServ.Buscar(criterio);
-                if (personas == null)
+                if (!ModelState.IsValid)
                 {
-                    return Ok(new List<PersonaListado>());
+                    return BadRequest(ModelState);
                 }
-                var personasListado = _mapper.Map<IEnumerable<PersonaListado>>(personas);
-                return Ok(personasListado);
+
+                var resultadoPaginado = await _personaServ.BuscarPaginado(criterio ?? "", parametrosPaginacion);
+
+                return Ok(resultadoPaginado);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error al obtener todas las personas.");
-                return StatusCode(500, "Error interno del servidor al obtener las personas.");
+                _logger.LogError(ex, $"Error al buscar personas paginadas con criterio '{criterio}'.");
+                return StatusCode(500, $"Error interno del servidor al buscar personas paginadas.");
             }
         }
 

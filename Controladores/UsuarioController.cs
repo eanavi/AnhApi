@@ -43,18 +43,34 @@ namespace AnhApi.Controladores
         [HttpGet] // Ruta: GET api/usuarios
         [ProducesResponseType(typeof(IEnumerable<UsuarioListado>), 200)]
         [ProducesResponseType(401)] // Unauthorized
+        [ProducesResponseType(400)] // Bad Request (validación de modelo)
         [ProducesResponseType(500)]
-        public async Task<ActionResult<IEnumerable<UsuarioListado>>> ObtenerTodosUsuarios()
+        public async Task<ActionResult<IEnumerable<UsuarioListado>>> ObtenerTodosUsuarios(
+            [FromQuery]PaginacionParametros paginacion)
         {
             try
             {
-                var usuarios = await _usuarioServicio.ObtenerTodosAsync(); // Método heredado de GenericoServicio
-                if (usuarios == null)
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState); // Devuelve errores de validación del modelo
+                }
+
+                var usuariosPag = await _usuarioServicio.ObtenerTodosPagAsync(paginacion); // Método heredado de GenericoServicio
+                if (usuariosPag == null)
                 {
                     return Ok(new List<UsuarioListado>());
                 }
-                var usuariosListado = _mapper.Map<IEnumerable<UsuarioListado>>(usuarios);
-                return Ok(usuariosListado);
+                var usuariosListado = _mapper.Map<IEnumerable<UsuarioListado>>(usuariosPag.Elementos);
+                var resultado = new PaginacionResultado<UsuarioListado>
+                {
+                    Elementos = usuariosListado,
+                    TotalRegistros = usuariosPag.TotalRegistros,
+                    PaginaActual = usuariosPag.PaginaActual,
+                    TamanoPagina = usuariosPag.TamanoPagina,
+                    TotalPaginas = usuariosPag.TotalPaginas
+                };
+
+                return Ok(resultado);
             }
             catch (Exception ex)
             {

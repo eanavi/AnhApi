@@ -41,17 +41,35 @@ namespace AnhApi.Controladores
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<ParametroEsq>), 200)]
         [ProducesResponseType(500)]
-        public async Task<ActionResult<IEnumerable<ParametroEsq>>> ObtenerTodosParametros()
+        public async Task<ActionResult<PaginacionResultado<ParametroEsq>>> ObtenerTodosParametros(
+            [FromQuery] PaginacionParametros paginacion)
         {
             try
             {
-                var parametros = await _parametroServicio.ObtenerTodosAsync();
-                if (parametros == null)
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+
+                var parametrosPag = await _parametroServicio.ObtenerTodosPagAsync(paginacion);
+
+                if (parametrosPag == null)
                 {
                     return Ok(new List<ParametroEsq>());
                 }
-                var parametrosEsq = _mapper.Map<IEnumerable<ParametroListado>>(parametros);
-                return Ok(parametrosEsq);
+
+                var parametrosLista = _mapper.Map<IEnumerable<ParametroListado>>(parametrosPag.Elementos);
+                var resultado = new PaginacionResultado<ParametroListado>
+                {
+                    Elementos = parametrosLista,
+                    TotalRegistros = parametrosPag.TotalRegistros,
+                    PaginaActual = parametrosPag.PaginaActual,
+                    TamanoPagina = parametrosPag.TamanoPagina,
+                    TotalPaginas = parametrosPag.TotalPaginas
+                };
+         
+     
+                return Ok(resultado);
             }
             catch (Exception ex)
             {
@@ -59,6 +77,9 @@ namespace AnhApi.Controladores
                 return StatusCode(500, "Error interno del servidor al obtener parámetros.");
             }
         }
+
+        
+
 
         /// <summary>
         /// Obtiene un parámetro por su ID.

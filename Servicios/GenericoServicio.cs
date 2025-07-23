@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using AnhApi.Datos;
 using AnhApi.Interfaces;
 using AnhApi.Modelos;
+using AnhApi.Esquemas;
 namespace AnhApi.Servicios
 {
     public class GenericoServicio<T, TKey> : IGenericoServicio<T, TKey> where T:class, IAuditable   
@@ -26,11 +27,44 @@ namespace AnhApi.Servicios
         {
             try
             {
-                IQueryable<T> query = _dbSet;
+                var query = _dbSet.AsQueryable();
                 query = query.Where(e => e.aud_estado == 0);
-                var resultado = await query.ToListAsync();
+                var entidades = await query.ToListAsync();
+                return entidades;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al obtener todas las entidades de tipo {EntityType}.", typeof(T).Name);
+                throw; // Vuelve a lanzar la excepción después de registrar el error
+            }
+        }
 
-                return resultado;
+        public async Task<PaginacionResultado<T>> ObtenerTodosPagAsync(PaginacionParametros paginacion)
+        {
+            try
+            {
+                if( paginacion == null)
+                {
+                    paginacion = new PaginacionParametros(); // Asigna valores por defecto si es nulo
+                }
+
+                IQueryable<T> query = _dbSet.AsQueryable();
+                query = query.Where(e => e.aud_estado == 0);
+                var totalRegistros = await query.CountAsync();
+
+                var resultado = await query
+                    .Skip(paginacion.ElementosAOmitir)
+                    .Take(paginacion.TamanoPagina)
+                    .ToListAsync();
+
+                return new PaginacionResultado<T>
+                {
+                    Elementos = resultado,
+                    TotalRegistros = totalRegistros,
+                    PaginaActual = paginacion.PaginaNumero,
+                    TamanoPagina = paginacion.TamanoPagina,
+                    TotalPaginas = (int)Math.Ceiling((double)totalRegistros / paginacion.TamanoPagina)
+                };
         
             }
             catch (Exception ex)
