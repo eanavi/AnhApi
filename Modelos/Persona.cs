@@ -9,12 +9,18 @@ namespace AnhApi.Modelos
         public string primer_apellido { get; set; } = null!;
         public string segundo_apellido { get; set; } = null!;
         public DateTime fecha_nacimiento { get; set; }
+
+        //public int tipo_identificacion { get; set; }
         public string numero_identificacion { get; set; } = null!;
         public string? complemento { get; set; }
         public int genero { get; set; } = 0; // -1: No especificado, 1: Masculino, 0: Femenino
         public JsonDocument? direccion { get; set; }
         public JsonDocument? telefono { get; set; }
         public JsonDocument? correo { get; set; }
+
+
+        public Usuario? Usuario { get; set; } // Relación con Usuario, si existe
+
     }
 }
 

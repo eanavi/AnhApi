@@ -24,6 +24,16 @@ namespace AnhApi.Esquemas
 
     }
 
+    public class ParametroCmb
+    {
+        [Required]
+        public int Codigo { get; set; }
+
+        [Required]
+        [StringLength(120)]
+        public string Descripcion { get; set; }
+    }
+
     /// <summary>
     /// Son los campos necesarios para listar un Parametro
     /// </summary>

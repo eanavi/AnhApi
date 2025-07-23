@@ -12,7 +12,8 @@ namespace AnhApi.Mapeos
                 .ForMember(dest => dest.id_usuario, opt => opt.Ignore()) // ID is DB generated
                 .ForMember(dest => dest.id_persona, opt => opt.MapFrom(src => src.IdPersona))
                 .ForMember(dest => dest.login, opt => opt.MapFrom(src => src.Login))
-                .ForMember(dest => dest.clave, opt => opt.MapFrom(src => src.Clave));
+                .ForMember(dest => dest.clave, opt => opt.MapFrom(src => src.Clave))
+                .ForMember(dest => dest.id_perfil, opt =>opt.MapFrom(src => src.IdPerfil));
             // Asumiendo que los campos de auditoria los asume el controlador 
 
             // --- Mapeo para el Listado (GET /api/usuarios) ---

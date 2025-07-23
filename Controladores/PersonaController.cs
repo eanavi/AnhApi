@@ -2,6 +2,7 @@
 using AnhApi.Modelos;
 using AnhApi.Servicios;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
@@ -10,21 +11,25 @@ using System.Threading.Tasks;
 
 namespace AnhApi.Controladores
 {
+    /// <summary>
+    /// Rutas para Persona, estan listadas las opciones por defecto para un CRUD
+    /// </summary>
     [ApiController] // Indica que es un controlador de API
     [Route("api/[controller]")] // Define la ruta base para este controlador
+    [Authorize]
     public class PersonaController : ControllerBase
     {
-        private readonly IGenericoServicio<Persona, Guid> _personaServicio;
         private readonly IMapper _mapper;
         private readonly ILogger<PersonaController> _logger;
+        private readonly PersonaServicio _personaServ;
 
         // Constructor con inyección de dependencias
         public PersonaController(
-            IGenericoServicio<Persona, Guid> personaServicio,
+            PersonaServicio personaServ,
             IMapper mapper,
             ILogger<PersonaController> logger)
         {
-            _personaServicio = personaServicio ?? throw new ArgumentNullException(nameof(personaServicio));
+            _personaServ = personaServ ?? throw new ArgumentNullException(nameof(personaServ));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
@@ -42,11 +47,10 @@ namespace AnhApi.Controladores
         {
             try
             {
-                var personas = await _personaServicio.ObtenerTodosAsync();
+                var personas = await _personaServ.ObtenerTodosAsync();
                 if (personas == null)
                 {
                     // Aunque el servicio debería devolver una colección vacía si no hay nada,
-                    // NotFound es una opción si no se espera que exista la "colección" en absoluto.
                     return Ok(new List<PersonaListado>()); // Devolver una lista vacía en lugar de NotFound para "todos"
                 }
                 // Mapear la colección de modelos a la colección de DTOs de listado
@@ -60,6 +64,36 @@ namespace AnhApi.Controladores
             }
         }
 
+        /// <summary>
+        /// Buscar personas realiza una busqueda por tres criterios diferentes: nombre, ci o fechaNacimiento 
+        /// </summary>
+        /// <param name="criterio">
+        /// combinaciones: paterno, 1erNombre patero, 1erNombre paterno materno 
+        ///                                                      1erNombre 2doNombre paterno materno
+        /// carnet de identidad que son numeros
+        /// fecha de nacimiento en formato dd-mm-yyyy para no confundir al enrutador</param>
+        /// <returns>lista de Personas</returns>
+        [HttpGet("buscar/{criterio}")]
+        [ProducesResponseType(typeof(IEnumerable<PersonaListado>), 200)]
+        [ProducesResponseType(500)]
+        public async Task<ActionResult<IEnumerable<PersonaListado>>> BuscarPersonas(string criterio)
+        {
+            try
+            {
+                var personas = await _personaServ.Buscar(criterio);
+                if (personas == null)
+                {
+                    return Ok(new List<PersonaListado>());
+                }
+                var personasListado = _mapper.Map<IEnumerable<PersonaListado>>(personas);
+                return Ok(personasListado);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al obtener todas las personas.");
+                return StatusCode(500, "Error interno del servidor al obtener las personas.");
+            }
+        }
 
 
         /// <summary>
@@ -75,7 +109,7 @@ namespace AnhApi.Controladores
         {
             try
             {
-                var persona = await _personaServicio.ObtenerPorIdAsync(id);
+                var persona = await _personaServ.ObtenerPorIdAsync(id);
                 if (persona == null)
                 {
                     _logger.LogInformation($"Persona con ID {id} no encontrada o no activa.");
@@ -112,22 +146,15 @@ namespace AnhApi.Controladores
                     return BadRequest(ModelState); // Devuelve errores de validación del DTO
                 }
 
-                var personaModel = _mapper.Map<Persona>(personaCreacionDto);
+                
+                var nuevaPersona = _mapper.Map<Persona>(personaCreacionDto);
 
-                // --- Asignación de campos de auditoría al modelo ANTES de crear ---
-                // Estos campos no vienen en PersonaCreacion, pero son requeridos por el modelo de BD.
-                // Aquí necesitarías una forma de obtener el usuario y la IP reales (ej. desde claims de JWT)
-                personaModel.aud_usuario = User.Identity?.Name ?? "sistema_api"; // Usuario que realiza la acción
-                personaModel.aud_ip = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "::1"; // IP del cliente
-                personaModel.aud_fecha = DateTime.UtcNow; // Fecha y hora actual UTC
-                personaModel.aud_estado = 0; // O el valor por defecto que uses para "activo"
+                string usuarioAuditoria = User.Identity?.Name ?? "sistema_api"; // Usuario que realiza la acción
+                string ipAuditoria = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "::1"; // IP del cliente
 
-                var personaCreada = await _personaServicio.CrearAsync(
-                    personaModel,
-                    personaModel.aud_usuario,
-                    personaModel.aud_ip); // Pasar los campos de auditoría al servicio base
+                var personaCreada = await _personaServ.CrearAsync(nuevaPersona, usuarioAuditoria, ipAuditoria); 
+                // Pasar los campos de auditoría al servicio base
 
-                // Mapear el modelo creado (que ya tiene su ID generado y campos de auditoría)
                 // al DTO completo para la respuesta.
                 var personaDto = _mapper.Map<Persona>(personaCreada);
 
@@ -173,19 +200,11 @@ namespace AnhApi.Controladores
 
                 var personaModel = _mapper.Map<Persona>(personaDto);
 
-                // Los campos de auditoría ya deberían venir en personaDto si se desea actualizar,
-                // o se pueden sobreescribir aquí si solo se gestionan desde el backend.
-                // Si quieres que el PUT solo sea para el usuario logueado, puedes forzar aquí
-                // personaModel.aud_usuario = User.Identity?.Name ?? "sistema_api_put";
-                // personaModel.aud_ip = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "::1";
-                // personaModel.aud_fecha = DateTime.UtcNow;
+                //Verificar si se almacenara el nombre de usuario en el momento de la modificacion del registro
+                string usuarioAuditoria = User.Identity?.Name ?? "sistema_api_put"; // Usuario que realiza la acción
+                string ipAuditoria = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "::1"; // IP del cliente
 
-                var usuarioAuditoria = User.Identity?.Name ?? "sistema_api_put"; // Usuario que realiza la acción
-                var ipAuditoria = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "::1"; // IP del cliente
-
-
-                var resultado = await _personaServicio.ActualizarAsync(
-                    id, personaModel, usuarioAuditoria, ipAuditoria);
+                var resultado = await _personaServ.ActualizarAsync(id, personaModel, usuarioAuditoria, ipAuditoria);
 
                 if (!resultado)
                 {
@@ -217,10 +236,10 @@ namespace AnhApi.Controladores
             try
             {
                 // Auditoría para la eliminación
-                var usuarioAuditoria = User.Identity?.Name ?? "sistema_api_delete";
-                var ipAuditoria = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "::1";
+                string usuarioAuditoria = User.Identity?.Name ?? "sistema_api_delete";
+                string ipAuditoria = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "::1";
 
-                var resultado = await _personaServicio.EliminarAsync(id, usuarioAuditoria, ipAuditoria);
+                var resultado = await _personaServ.EliminarAsync(id, usuarioAuditoria, ipAuditoria);
 
                 if (!resultado)
                 {

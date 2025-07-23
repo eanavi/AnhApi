@@ -3,6 +3,7 @@ using AnhApi.Esquemas;
 using AnhApi.Modelos;
 using AnhApi.Servicios; // Asegúrate de incluir este using
 using AutoMapper;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
@@ -88,6 +89,30 @@ namespace AnhApi.Controladores
             }
         }
 
+        [HttpGet("grupo/{grupo}")]
+        [ProducesResponseType(typeof(IEnumerable<ParametroCmb>), 200)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(500)]
+        public async Task<ActionResult<IEnumerable<ParametroCmb>>> ObtenerGrupo(string grupo)
+        {
+            try
+            {
+                var parametro = await _parametroServicio.ObtenerGrupo(grupo);
+                if (parametro == null)
+                {
+                    _logger.LogInformation($"Parametro con grupo {grupo} no encontrado");
+                    return NotFound($"Grupo de parametros no encontrados");
+                }
+                var prmCmb = _mapper.Map<IEnumerable<ParametroCmb>>(parametro);
+                return Ok(prmCmb);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error al obtener el parametro");
+                return StatusCode(500, $"Error interno del servidor al obtener el grupo {grupo}");
+            }
+        }
+
         /// <summary>
         /// Crea un nuevo parámetro.
         /// </summary>
@@ -109,12 +134,10 @@ namespace AnhApi.Controladores
 
                 var parametroModel = _mapper.Map<Parametro>(parametroCreacionDto);
 
-                string usuario = "Sistema"; // Aquí puedes obtener el usuario actual si es necesario
-                string ip = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Desconocida"; // IP del cliente
+                parametroModel.aud_estado = 0; //El valor por defecto para activo
 
-                // No necesitamos pasar usuario/IP a este servicio, ya que no tiene esos campos en el modelo
-                // El estado se asigna dentro del servicio o por el valor por defecto de la BD.
-                var parametroCreado = await _parametroServicio.CrearAsync(parametroModel, usuario, ip);
+
+                var parametroCreado = await _parametroServicio.CrearAsync(parametroModel);
 
                 var parametroEsq = _mapper.Map<ParametroEsq>(parametroCreado);
 
@@ -158,12 +181,8 @@ namespace AnhApi.Controladores
 
                 var parametroModel = _mapper.Map<Parametro>(parametroEsqDto);
 
-                string usuario = "Sistema"; // Aquí puedes obtener el usuario actual si es necesario
-                string ip = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Desconocida"; // IP del cliente
-
                 // No necesitamos pasar usuario/IP a este servicio
-                var resultado = await _parametroServicio.ActualizarAsync(id, parametroModel, usuario, ip);
-
+                var resultado = await _parametroServicio.ActualizarAsync(id, parametroModel);
                 if (!resultado)
                 {
                     _logger.LogInformation($"No se pudo actualizar el parámetro con ID {id}. Podría no existir o no estar activo.");
@@ -192,10 +211,8 @@ namespace AnhApi.Controladores
         {
             try
             {
-                string usuario = "Sistema"; // Aquí puedes obtener el usuario actual si es necesario
-                string ip = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Desconocida"; // IP del cliente
                 // No necesitamos pasar usuario/IP a este servicio
-                var resultado = await _parametroServicio.EliminarAsync(id, usuario, ip);
+                var resultado = await _parametroServicio.EliminarAsync(id);
 
                 if (!resultado)
                 {

@@ -1,43 +1,56 @@
-﻿using AnhApi.Datos;
+﻿using AnhApi.Datos; 
 using AnhApi.Modelos;
-using AutoMapper;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using Npgsql;
+using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace AnhApi.Servicios
 {
-    // PersonaServicio ahora hereda de la versión corregida de GenericoServicio
     public class PersonaServicio : GenericoServicio<Persona, Guid>
     {
-        // Inyectamos IMapper directamente en esta clase, no en la base
-        private readonly IMapper _mapper;
+        private readonly AppDbContext _contexto; 
+        private readonly ILogger<PersonaServicio> _logger; 
 
-        public PersonaServicio(AppDbContext context, IMapper mapper,ILogger<GenericoServicio<Persona, Guid>> logger) : base(context, logger)
+        public PersonaServicio(AppDbContext contexto, ILogger<PersonaServicio> logger)
+            : base(contexto, logger) // Llama al constructor de GenericoServicio
         {
-            _mapper = mapper;
+            _contexto = contexto;
+            _logger = logger;
         }
 
-        // --- MÉTODOS QUE DEVUELVEN MODELOS (Recomendado) ---
-        // Este método se encargará de la lógica de negocio y devolverá el modelo
-        public async Task<IEnumerable<Persona>> BuscarPorNombreAsync(string nombre)
+        /// <summary>
+        /// Busca personas utilizando un procedimiento almacenado en la base de datos PostgreSQL.
+        /// </summary>
+        /// <param name="criterio">El texto a buscar en el procedimiento almacenado.</param>
+        /// <returns>Una colección de Personas que coinciden con el criterio.</returns>
+        public async Task<IEnumerable<Persona>> Buscar(string criterio)
         {
-            var entidades = await _context.Set<Persona>()
-                .Where(p => p.nombre.Contains(nombre) && p.aud_estado == 0)
-                .ToListAsync();
+            try
+            {
+                if (string.IsNullOrWhiteSpace(criterio))
+                {
+                    return await ObtenerTodosAsync();
+                }
 
-            return entidades; // Devuelve la lista de modelos
+                var personas = await _contexto.Personas
+                                           .FromSqlRaw("SELECT * FROM \"public\".\"buscar_personas\"(@criterio)", // Asegúrate del esquema y nombre exactos del SP
+                                                       new NpgsqlParameter("criterio", criterio))
+                                           .ToListAsync();
+                return personas;
+            }
+            catch (NpgsqlException ex)
+            {
+                _logger.LogError(ex, $"Error de PostgreSQL al buscar personas con criterio '{criterio}' usando el procedimiento almacenado.");
+                throw new ApplicationException($"Error al ejecutar el procedimiento de búsqueda de personas.", ex);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error inesperado al buscar personas con criterio '{criterio}'.");
+                throw;
+            }
         }
-
-        // --- MÉTODOS QUE DEVUELVEN DTOS (Alternativa si lo necesitas) ---
-        // En este caso el servicio mapea a un DTO.
-        // public async Task<IEnumerable<EsqPersona>> BuscarPorNombreComoDtoAsync(string nombre)
-        // {
-        //     var entidades = await _context.Set<Persona>()
-        //         .Where(p => p.nombre.Contains(nombre) && p.aud_estado == 0)
-        //         .ToListAsync();
-        //     return _mapper.Map<IEnumerable<EsqPersona>>(entidades); // Mapea a DTO
-        // }
     }
 }

@@ -9,6 +9,9 @@ namespace AnhApi.Esquemas
         public Guid IdPersona { get; set; }
 
         [Required]
+        public int IdPerfil { get; set; }
+
+        [Required]
         [StringLength(50)]
         public string Login { get; set; } = null!;
 
@@ -33,9 +36,6 @@ namespace AnhApi.Esquemas
 
     public class UsuarioEsq : UsuarioListado
     {
-        [Required(ErrorMessage = "El Id del usuario es requerido") ]
-        public Guid IdUsuario { get; set; }
-
         [Required]
         [StringLength(100)]
         public string Clave { get; set; } = null!;

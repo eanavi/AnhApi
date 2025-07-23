@@ -1,16 +1,68 @@
-﻿using AnhApi.Datos;
-using AnhApi.Modelos;
-using Microsoft.Extensions.Logging;
+﻿using AnhApi.Modelos;
+using AnhApi.Datos;
+using AnhApi.Esquemas;
 using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 
 namespace AnhApi.Servicios
 {
-    public class UsuarioServicio : GenericoServicio<Modelos.Usuario, Guid>
+    public class UsuarioServicio : GenericoServicio<Usuario, long>
     {
-        public UsuarioServicio(AppDbContext context, ILogger<GenericoServicio<Modelos.Usuario, Guid>> logger,IMapper mapper ) 
-            : base(context, logger)
+        private readonly IMapper _mapper;
+        private readonly AppDbContext _contexto;
+        private readonly ILogger<UsuarioServicio> _logger;
+
+        public UsuarioServicio(AppDbContext contexto, ILogger<UsuarioServicio> logger, IMapper mapper) : base(contexto, logger)
         {
+            _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+            _contexto = contexto ?? throw new ArgumentNullException(nameof(contexto));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
+
+        public async Task<UsuarioEsq> CrearUsuario(UsuarioCreacion usuarioCreacion, string usuario, string ip)
+        {
+            try
+            {
+                var usr = _mapper.Map<Usuario>(usuarioCreacion);
+
+                usr.clave = BCrypt.Net.BCrypt.HashPassword(usuarioCreacion.Clave, 12);
+                usr.aud_usuario = usuario;
+                usr.aud_ip = ip;
+
+                _contexto.Usuarios.Add(usr);
+                await _contexto.SaveChangesAsync();
+
+                return _mapper.Map<UsuarioEsq>(usr);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al crear el usuario.");
+                throw; // Puedes lanzar una excepción personalizada si lo deseas
+
+            }
+        }
+
+        public async Task<UsuarioEsq?> ObtenerPorLogin(string login)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(login))
+                {
+                    throw new ArgumentException("El login no puede ser nulo o vacío.", nameof(login));
+                }
+                var usuario = await _contexto.Usuarios.FirstOrDefaultAsync(u => u.login == login);
+                if (usuario == null)
+                {
+                    return null;
+                }
+                return _mapper.Map<UsuarioEsq>(usuario);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al obtener el usuario por login.");
+                throw; // Puedes lanzar una excepción personalizada si lo deseas
+            }
+        }
     }
 }

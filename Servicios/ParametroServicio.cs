@@ -6,6 +6,7 @@ using AutoMapper;
 
 using AnhApi.Datos;
 using AnhApi.Modelos;
+using AnhApi.Esquemas;
 
 
 namespace AnhApi.Servicios
@@ -13,7 +14,10 @@ namespace AnhApi.Servicios
 
     /// <summary>
     /// Require un servicio especializado para manejar las operaciones CRUD de la entidad Parametro.
-    /// debido a que la entidad Parametro NO hereda de ModeloBase
+    /// debido a que la entidad Parametro NO hereda de ModeloBase por lo que no tiene los campos de
+    /// aud_usuario, aud_ip, aud_fecha, solo cuenta con aud_estado para la eliminacion logica 
+    /// 
+    /// Se debe consultar las opciones de loggin para ver que informacion es relevante 
     /// </summary>
     public class ParametroServicio
     {
@@ -28,14 +32,18 @@ namespace AnhApi.Servicios
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
+        /// <summary>
+        /// Listado general de todos los archivos
+        /// </summary>
+        /// <returns></returns>
         public async Task<IEnumerable<Parametro>> ObtenerTodosAsync()
         {
             try
             {
                 var query = _context.Set<Parametro>().AsQueryable();
                 query = query.Where(e => e.aud_estado == 0);
-                var entidades = await query.ToListAsync();
-                return entidades;
+                var paramExistentes = await query.ToListAsync();
+                return paramExistentes;
             }
             catch (Exception ex)
             {
@@ -44,16 +52,21 @@ namespace AnhApi.Servicios
             }
         }
 
+        /// <summary>
+        /// Obtener un registro en particular para lo cual se debe conocer el nombre
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         public async Task<Parametro?> ObtenerPorIdAsync(int id)
         {
             try
             {
-                var entidad = await _context.Set<Parametro>().FindAsync(id);
-                if (entidad == null || entidad.aud_estado != 0)
+                var paramExistente = await _context.Set<Parametro>().FindAsync(id);
+                if (paramExistente == null || paramExistente.aud_estado != 0)
                 {
                     return null;
                 }
-                return entidad;
+                return paramExistente;
             }
             catch (Exception ex)
             {
@@ -62,13 +75,17 @@ namespace AnhApi.Servicios
             }
         }
 
-        public async Task<Parametro> CrearAsync(Parametro entidad, string usuario, string ip)
+        /// <summary>
+        /// Creacion de un registro de parametro
+        /// </summary>
+        /// <param name="entidad"></param>
+        /// <returns></returns>
+        public async Task<Parametro> CrearAsync(Parametro entidad)
         {
             try
             {
-                entidad.aud_estado = entidad.aud_estado?? 0; // Estado activo
                 _context.Set<Parametro>().Add(entidad);
-                _logger.LogInformation($"Prametro creado con Id: {entidad.id_parametro}");
+                //_logger.LogInformation($"Prametro creado con Id: {entidad.id_parametro}");
                 await _context.SaveChangesAsync();
                 return entidad;
             }
@@ -79,26 +96,33 @@ namespace AnhApi.Servicios
             }
         }
 
-        public async Task<bool> ActualizarAsync(int id, Parametro entidad, string usuario, string ip)
+        /// <summary>
+        /// Actualizacion de un registro de parametro
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="entidad"></param>
+        /// <returns></returns>
+        public async Task<bool> ActualizarAsync(int id, Parametro entidad)
         {
             try
             {
-                var existingEntity = await _context.Parametros.FirstOrDefaultAsync(p => p.id_parametro == id && p.aud_estado == 0);
-                if (existingEntity == null)
+                var paramExistente = await _context.Parametros.FirstOrDefaultAsync(
+                    p => p.id_parametro == id && p.aud_estado == 0);
+                if (paramExistente == null)
                 {
                     _logger.LogWarning("No se encontró el registro de Parametro con ID {Id} o está eliminado.", id);
                     return false; // No se encontró la entidad o está eliminada
                 }
                 // Actualizar los campos necesarios
-                existingEntity.codigo = entidad.codigo;
-                existingEntity.descripcion = entidad.descripcion;
-                existingEntity.sigla = entidad.sigla;
-                existingEntity.grupo = entidad.grupo;
-                existingEntity.aud_estado = entidad.aud_estado;
+                paramExistente.codigo = entidad.codigo;
+                paramExistente.descripcion = entidad.descripcion;
+                paramExistente.sigla = entidad.sigla;
+                paramExistente.grupo = entidad.grupo;
+                paramExistente.aud_estado = entidad.aud_estado;
 
-                _context.Set<Parametro>().Update(existingEntity);
+                _context.Set<Parametro>().Update(paramExistente);
                 await _context.SaveChangesAsync();
-                _logger.LogInformation($"Parametro actualizado con Id: {id}");
+                //_logger.LogInformation($"Parametro actualizado con Id: {id}"); 
                 return true;
             }
             catch (Exception ex)
@@ -108,18 +132,24 @@ namespace AnhApi.Servicios
             }
         }
 
-        public async Task<bool> EliminarAsync(int id, string usuario, string ip)
+        /// <summary>
+        /// Eliminacion logica de un registro de parametro
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<bool> EliminarAsync(int id)
         {
             try
             {
-                var entidad = await _context.Parametros.FirstOrDefaultAsync(p => p.id_parametro == id && p.aud_estado == 0);
-                if (entidad == null)
+                var paramExistente = await _context.Parametros.FirstOrDefaultAsync(
+                    p => p.id_parametro == id && p.aud_estado == 0);
+                if (paramExistente == null)
                 {
                     _logger.LogWarning("No se encontró el registro de Parametro con ID {Id} o está eliminado.", id);
                     return false; // No se encontró la entidad o ya está eliminada
                 }
-                entidad.aud_estado = 1; // Marcar como eliminado
-                _context.Set<Parametro>().Update(entidad);
+                paramExistente.aud_estado = 1; // Marcar como eliminado
+                _context.Set<Parametro>().Update(paramExistente);
                 await _context.SaveChangesAsync();
                 _logger.LogInformation($"Parametro eliminado con Id: {id}");
                 return true;
@@ -131,17 +161,23 @@ namespace AnhApi.Servicios
             }
         }
 
+        /// <summary>
+        /// Eliminacion fisica de un registro debe realizarse con cuidado para 
+        /// no dejar registros huerfanos en la base de datos
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         public async Task<bool> EliminarFisico(int id)
         {
             try
             {
-                var entidad = await _context.Parametros.FindAsync(id);
-                if (entidad == null)
+                var paramExistente = await _context.Parametros.FindAsync(id);
+                if (paramExistente == null)
                 {
                     _logger.LogWarning("No se encontró el registro de Parametro con ID {Id}.", id);
                     return false; // No se encontró la entidad
                 }
-                _context.Set<Parametro>().Remove(entidad);
+                _context.Set<Parametro>().Remove(paramExistente);
                 await _context.SaveChangesAsync();
                 _logger.LogInformation($"Parametro eliminado físicamente con Id: {id}");
                 return true;
@@ -154,5 +190,25 @@ namespace AnhApi.Servicios
         }
 
 
+        /// <summary>
+        /// Despliega en una lista los miembros de un grupo
+        /// </summary>
+        /// <param name="grupo"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<Parametro>> ObtenerGrupo(string grupo)
+        {
+            try
+            {
+                var query = _context.Set<Parametro>().AsQueryable();
+                query = query.Where(e => e.grupo == grupo && e.aud_estado == 0);
+                var paramExistentes = await query.ToListAsync();
+                return paramExistentes;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al recuperar el grupo {grupo},", grupo);
+                throw;
+            }
+        }
     }
 }

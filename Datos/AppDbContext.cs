@@ -18,6 +18,7 @@ namespace AnhApi.Datos
 
             // Registrar todas las configuraciones en el ensamblado donde está AppDbContext
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
+
         }
 
     }

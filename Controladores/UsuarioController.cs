@@ -1,177 +1,300 @@
-﻿using AnhApi.Esquemas;
-using AnhApi.Modelos;
-using AnhApi.Servicios;
-using Microsoft.AspNetCore.Mvc;
-using AutoMapper;
-
+﻿using AnhApi.Esquemas; // Para los DTOs de Usuario
+using AnhApi.Modelos;   // Para el modelo de base de datos Usuario
+using AnhApi.Servicios; // Para UsuarioServicio (que hereda de GenericoServicio)
+using AutoMapper;       // Para IMapper
+using Microsoft.AspNetCore.Mvc; // Para el controlador y los atributos de HTTP
+using Microsoft.Extensions.Logging; // Para ILogger
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization; // Para [Authorize]
 
 namespace AnhApi.Controladores
 {
-    [Route("api/[controller]")]
-    [ApiController]
+    /// <summary>
+    /// Provee un las rutas para el registro de un usuario, las rutas de autenticacion se encuentran en el controlador de autorizacion
+    /// Todas las rutas requieren autenticacion, algunas rutas deberian estar reservadas para determinados perfiles
+    /// </summary>
+    [ApiController] // Indica que es un controlador de API
+    [Route("api/[controller]")] // Define la ruta base para este controlador
+    [Authorize] // Protege todas las rutas de este controlador por defecto (requiere JWT)
     public class UsuarioController : ControllerBase
     {
-        private readonly IGenericoServicio<Modelos.Usuario, Guid> _servicioUsuario;
+        private readonly UsuarioServicio _usuarioServicio; // Inyectamos el servicio específico de Usuario
         private readonly IMapper _mapper;
         private readonly ILogger<UsuarioController> _logger;
 
-        #region Constructor
+        // Constructor con inyección de dependencias
         public UsuarioController(
-            IGenericoServicio<Usuario, Guid> servicioUsuario, 
-            IMapper mapper, 
+            UsuarioServicio usuarioServicio,
+            IMapper mapper,
             ILogger<UsuarioController> logger)
         {
-            _servicioUsuario = servicioUsuario ?? throw new ArgumentNullException(nameof(servicioUsuario));
-            _mapper = mapper?? throw new ArgumentNullException(nameof(mapper));
-            _logger = logger?? throw new ArgumentNullException(nameof(logger), "Logger cannot be null");
+            _usuarioServicio = usuarioServicio ?? throw new ArgumentNullException(nameof(usuarioServicio));
+            _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
-        #endregion Constructor
 
-        #region ListarTodo
-        [HttpGet]
-        [ProducesResponseType(typeof(IEnumerable<UsuarioEsq>), 200)]
+        /// <summary>
+        /// Obtiene una lista de todos los usuarios activos (vista de listado reducido).
+        /// Requiere autenticación.
+        /// </summary>
+        /// <returns>Una lista de UsuarioListado.</returns>
+        [HttpGet] // Ruta: GET api/usuarios
+        [ProducesResponseType(typeof(IEnumerable<UsuarioListado>), 200)]
+        [ProducesResponseType(401)] // Unauthorized
         [ProducesResponseType(500)]
-        public async Task<ActionResult<IEnumerable<UsuarioEsq>>> ListarTodo()
-        {
-            var usuarios = await _servicioUsuario.ObtenerTodosAsync();
-            if (usuarios == null || !usuarios.Any())
-            {
-                _logger.LogInformation("No se encontraron usuarios");
-                return NotFound();
-            }
-            var usuariosListado = _mapper.Map<IEnumerable<UsuarioListado>>(usuarios);
-            return Ok(usuarios);
-        }
-        #endregion ListarTodo
-
-        #region ObtenerPorId
-        [HttpGet("{id}")]
-        [ProducesResponseType(typeof(Usuario),200)]
-        [ProducesResponseType(404)]
-        [ProducesResponseType(500)]
-        public async Task<ActionResult<UsuarioEsq>> ObtenerPorId(Guid id)
+        public async Task<ActionResult<IEnumerable<UsuarioListado>>> ObtenerTodosUsuarios()
         {
             try
             {
-                var usuario = await _servicioUsuario.ObtenerPorIdAsync(id);
+                var usuarios = await _usuarioServicio.ObtenerTodosAsync(); // Método heredado de GenericoServicio
+                if (usuarios == null)
+                {
+                    return Ok(new List<UsuarioListado>());
+                }
+                var usuariosListado = _mapper.Map<IEnumerable<UsuarioListado>>(usuarios);
+                return Ok(usuariosListado);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al obtener todos los usuarios.");
+                return StatusCode(500, "Error interno del servidor al obtener usuarios.");
+            }
+        }
+
+        /// <summary>
+        /// Obtiene un usuario por su ID (vista completa).
+        /// Requiere autenticación.
+        /// </summary>
+        /// <param name="id">El ID del usuario (long).</param>
+        /// <returns>Un objeto UsuarioEsq (DTO completo).</returns>
+        [HttpGet("{id:long}")] // Ruta: GET api/usuarios/{id}
+        [ProducesResponseType(typeof(UsuarioEsq), 200)]
+        [ProducesResponseType(401)] // Unauthorized
+        [ProducesResponseType(404)] // Not Found
+        [ProducesResponseType(500)]
+        public async Task<ActionResult<UsuarioEsq>> ObtenerUsuarioPorId(long id)
+        {
+            try
+            {
+                var usuario = await _usuarioServicio.ObtenerPorIdAsync(id); // Método heredado de GenericoServicio
                 if (usuario == null)
                 {
-                    _logger.LogInformation("Usuario con ID {Id} no encontrado", id);
-                    return NotFound();
+                    _logger.LogInformation($"Usuario con ID {id} no encontrado o no activo.");
+                    return NotFound($"Usuario con ID {id} no encontrado.");
                 }
-                var usuarioEsq = _mapper.Map<UsuarioEsq>(usuario);
-                return Ok(usuarioEsq);
+                var usuarioDto = _mapper.Map<UsuarioEsq>(usuario);
+                return Ok(usuarioDto);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error al obtener el usuario con ID {Id}", id);
-
-                // Log the exception (not shown here)
-                return StatusCode(500, "Error interno del servidor");
+                _logger.LogError(ex, $"Error al obtener el usuario con ID {id}.");
+                return StatusCode(500, $"Error interno del servidor al obtener el usuario con ID {id}.");
             }
         }
-        #endregion ObtenerPorId
 
-        #region CrearUsuario
-
-        [HttpPost]
-        [ProducesResponseType(typeof(UsuarioEsq), 201)]
-        [ProducesResponseType(400)]
+        /// <summary>
+        /// Obtiene un usuario por su login (vista completa).
+        /// Requiere autenticación.
+        /// </summary>
+        /// <param name="login">El login del usuario que puede ser nombre_de_usuario o correo.</param>
+        /// <returns>Un objeto UsuarioEsq (DTO completo).</returns>
+        [HttpGet("login/{login}")] // Ruta: GET api/usuarios/login/{login}
+        [ProducesResponseType(typeof(UsuarioEsq), 200)]
+        [ProducesResponseType(401)] // Unauthorized
+        [ProducesResponseType(404)] // Not Found
         [ProducesResponseType(500)]
-        public async Task<ActionResult<UsuarioEsq>> CrearUsuario([FromBody] UsuarioCreacion usuarioCreacion)
+        public async Task<ActionResult<UsuarioEsq>> ObtenerUsuarioPorLogin(string login)
+        {
+            try
+            {
+                var usuario = await _usuarioServicio.ObtenerPorLogin(login); // Método específico de UsuarioServicio
+                if (usuario == null)
+                {
+                    _logger.LogInformation($"Usuario con login '{login}' no encontrado.");
+                    return NotFound($"Usuario con login '{login}' no encontrado.");
+                }
+                // ObtenerPorLogin ya devuelve UsuarioEsq, no necesita mapeo adicional aquí
+                return Ok(usuario);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error al obtener el usuario con login '{login}'.");
+                return StatusCode(500, $"Error interno del servidor al obtener el usuario con login '{login}'.");
+            }
+        }
+
+        /// <summary>
+        /// Crea un nuevo usuario.
+        /// Requiere autenticación y el rol 'Administrador'.
+        /// </summary>
+        /// <param name="usuarioCreacionDto">Los datos del usuario a crear.</param>
+        /// <returns>El UsuarioEsq creado.</returns>
+        [HttpPost] // Ruta: POST api/usuarios
+        //[Authorize(Roles = "Administrador")] // Solo administradores pueden crear usuarios
+        [ProducesResponseType(typeof(UsuarioEsq), 201)]
+        [ProducesResponseType(400)] // Bad Request (validación de modelo)
+        [ProducesResponseType(401)] // Unauthorized
+        [ProducesResponseType(403)] // Forbidden (si no tiene el rol)
+        [ProducesResponseType(500)]
+        public async Task<ActionResult<UsuarioEsq>> CrearUsuario(
+            [FromBody] UsuarioCreacion usuarioCreacionDto)
         {
             try
             {
                 if (!ModelState.IsValid)
                 {
-                    _logger.LogWarning("Modelo de usuario invalido: {Errors}", ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage));
-                    return BadRequest(ModelState);
+                    return BadRequest(ModelState); // Devuelve errores de validación del DTO
                 }
-                var usuario = _mapper.Map<Usuario>(usuarioCreacion);
-                usuario.aud_usuario = User.Identity?.Name ?? "Sistema";//verificar el usuario y recuperar del token
-                usuario.aud_ip = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Desconocido"; // IP del cliente
-                usuario.aud_fecha = DateTime.UtcNow; // Fecha de creación
-                usuario.aud_estado = 0;
 
-                var nuevoUsuario = await _servicioUsuario.CrearAsync(usuario, User.Identity?.Name ?? "Sistema", HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Desconocido");
-                var usuarioEsq = _mapper.Map<UsuarioEsq>(nuevoUsuario);
-                return CreatedAtAction(nameof(ObtenerPorId), new { id = usuarioEsq.IdUsuario }, usuarioEsq);
+                // Obtener datos de auditoría del contexto de la solicitud
+                var usuarioAuditoria = User.Identity?.Name ?? "sistema_api"; // Usuario que realiza la acción
+                var ipAuditoria = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "::1"; // IP del cliente
+
+                // Llama al método específico de UsuarioServicio que maneja el hashing y auditoría
+                var usuarioCreado = await _usuarioServicio.CrearUsuario(
+                    usuarioCreacionDto, usuarioAuditoria, ipAuditoria);
+
+                // 201 Created: Indica que se creó un nuevo recurso y devuelve su ubicación.
+                return CreatedAtAction(nameof(ObtenerUsuarioPorId),
+                                       new { id = usuarioCreado.IdUsuario },
+                                       usuarioCreado);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error al crear el usuario");
-                return StatusCode(500, "Error interno del servidor");
+                _logger.LogError(ex, "Error al crear un nuevo usuario.");
+                return StatusCode(500, "Error interno del servidor al crear el usuario.");
             }
         }
 
-        #endregion CrearUsuario
-
-        #region ActualizarUsuario
-        [HttpPut("{id:guid}")]
-        [ProducesResponseType(204)] // Sin contenido
-        [ProducesResponseType(400)] // No valido
-        [ProducesResponseType(404)] // No encontrado
-        [ProducesResponseType(500)] // Error interno del servidor
-        public async Task<ActionResult> ActualizarUsuario([FromRoute] Guid id, [FromBody] UsuarioEsq usuarioEsq)
+        /// <summary>
+        /// Actualiza un usuario existente.
+        /// Requiere autenticación y el rol 'Administrador'.
+        /// </summary>
+        /// <param name="id">El ID del usuario a actualizar.</param>
+        /// <param name="usuarioEsqDto">Los datos actualizados del usuario (DTO completo).</param>
+        /// <returns>No Content si la actualización es exitosa.</returns>
+        [HttpPut("{id:long}")] // Ruta: PUT api/usuarios/{id}
+        [Authorize(Roles = "Administrador")] // Solo administradores pueden actualizar usuarios
+        [ProducesResponseType(204)] // No Content
+        [ProducesResponseType(400)] // Bad Request (si el ID no coincide o DTO inválido)
+        [ProducesResponseType(401)] // Unauthorized
+        [ProducesResponseType(403)] // Forbidden
+        [ProducesResponseType(404)] // Not Found
+        [ProducesResponseType(500)]
+        public async Task<ActionResult> ActualizarUsuario(
+            long id,
+            [FromBody] UsuarioEsq usuarioEsqDto)
         {
             try
             {
-                if (id != usuarioEsq.IdUsuario)
+                if (id != usuarioEsqDto.IdUsuario)
                 {
-                    _logger.LogWarning("ID del usuario no coincide con el ID en el cuerpo de la solicitud");
-                    return BadRequest("El ID del usuario no coincide con el ID en el cuerpo de la solicitud");
+                    return BadRequest("El ID de la ruta no coincide con el ID del cuerpo de la solicitud.");
                 }
+
                 if (!ModelState.IsValid)
                 {
-                    _logger.LogWarning("Modelo de usuario invalido: {Errors}", ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage));
                     return BadRequest(ModelState);
                 }
-                var usuario = _mapper.Map<Usuario>(usuarioEsq);
-                usuario.aud_usuario = User.Identity?.Name ?? "Sistema";
-                usuario.aud_ip = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Desconocido";
-                usuario.aud_fecha = DateTime.UtcNow;
-                var actualizado = await _servicioUsuario.ActualizarAsync(id, usuario, User.Identity?.Name ?? "Sistema", HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Desconocido");
-                if (!actualizado)
+
+                var usuarioModel = _mapper.Map<Usuario>(usuarioEsqDto);
+
+                // Obtener datos de auditoría para la actualización
+                var usuarioAuditoria = User.Identity?.Name ?? "sistema_api_put";
+                var ipAuditoria = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "::1";
+
+                var resultado = await _usuarioServicio.ActualizarAsync(
+                    id, usuarioModel, usuarioAuditoria, ipAuditoria); // Método heredado de GenericoServicio
+
+                if (!resultado)
                 {
-                    _logger.LogWarning("No se pudo actualizar el usuario con ID {Id}", id);
-                    return NotFound();
+                    _logger.LogInformation($"No se pudo actualizar el usuario con ID {id}. Podría no existir o no estar activo.");
+                    return NotFound($"Usuario con ID {id} no encontrado o no se pudo actualizar.");
                 }
-                return NoContent();
+
+                return NoContent(); // 204 No Content para PUT exitoso
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error al actualizar el usuario con ID {Id}", id);
-                return StatusCode(500, "Error interno del servidor");
+                _logger.LogError(ex, $"Error al actualizar el usuario con ID {id}.");
+                return StatusCode(500, $"Error interno del servidor al actualizar el usuario con ID {id}.");
             }
         }
 
-        #endregion ActualizarUsuario
-
-        #region EliminarUsuario
-        [HttpDelete("{id:guid}")]
-        [ProducesResponseType(204)] // Sin contenido
-        [ProducesResponseType(404)] // No encontrado
-        [ProducesResponseType(500)] // Error interno del servidor
-        public async Task<ActionResult> EliminarUsuario([FromRoute] Guid id)
+        /// <summary>
+        /// Elimina lógicamente un usuario (cambia su estado a inactivo).
+        /// Requiere autenticación y el rol 'Administrador'.
+        /// </summary>
+        /// <param name="id">El ID del usuario a eliminar.</param>
+        /// <returns>No Content si la eliminación es exitosa.</returns>
+        [HttpDelete("{id:long}")] // Ruta: DELETE api/usuarios/{id}
+        [Authorize(Roles = "Administrador")] // Solo administradores pueden eliminar
+        [ProducesResponseType(204)] // No Content
+        [ProducesResponseType(401)] // Unauthorized
+        [ProducesResponseType(403)] // Forbidden
+        [ProducesResponseType(404)] // Not Found
+        [ProducesResponseType(500)]
+        public async Task<ActionResult> EliminarUsuario(long id)
         {
             try
             {
-                var usuario = User.Identity?.Name ?? "Sistema";
-                var ip = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "::1";
-                var eliminado = await _servicioUsuario.EliminarAsync(id, usuario, ip);
-                if (!eliminado)
+                // Obtener datos de auditoría para la eliminación
+                var usuarioAuditoria = User.Identity?.Name ?? "sistema_api_delete";
+                var ipAuditoria = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "::1";
+
+                var resultado = await _usuarioServicio.EliminarAsync(
+                    id, usuarioAuditoria, ipAuditoria); // Método heredado de GenericoServicio
+
+                if (!resultado)
                 {
-                    _logger.LogWarning("No se pudo eliminar el usuario con ID {Id}", id);
-                    return NotFound($"Persona con ID {id} no encontrada.");
+                    _logger.LogInformation($"No se pudo eliminar el usuario con ID {id}. Podría no existir.");
+                    return NotFound($"Usuario con ID {id} no encontrado.");
                 }
-                return NoContent();
+
+                return NoContent(); // 204 No Content
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Error al eliminar el usuario con ID {id}");
-                return StatusCode(500, $"Error interno del servidor");
+                _logger.LogError(ex, $"Error al eliminar el usuario con ID {id}.");
+                return StatusCode(500, $"Error interno del servidor al eliminar el usuario con ID {id}.");
             }
         }
-        #endregion EliminarUsuario
+
+        /// <summary>
+        /// Elimina físicamente un usuario de la base de datos.
+        /// Requiere autenticación y el rol 'Administrador'.
+        /// ¡Usar con extrema precaución!
+        /// </summary>
+        /// <param name="id">El ID del usuario a eliminar físicamente.</param>
+        /// <returns>No Content si la eliminación es exitosa.</returns>
+        [HttpDelete("fisico/{id:long}")] // Ruta: DELETE api/usuarios/fisico/{id}
+        //[Authorize(Roles = "Administrador")] // Solo administradores pueden eliminar físicamente
+        [ProducesResponseType(204)] // No Content
+        [ProducesResponseType(401)] // Unauthorized
+        [ProducesResponseType(403)] // Forbidden
+        [ProducesResponseType(404)] // Not Found
+        [ProducesResponseType(500)]
+        public async Task<ActionResult> EliminarUsuarioFisico(long id)
+        {
+            try
+            {
+                var usuarioEliminado = await _usuarioServicio.EliminarFisicoAsync(id); // Método heredado de GenericoServicio
+
+                if (usuarioEliminado == null)
+                {
+                    _logger.LogInformation($"No se pudo eliminar físicamente el usuario con ID {id}. No encontrado.");
+                    return NotFound($"Usuario con ID {id} no encontrado.");
+                }
+
+                return NoContent(); // 204 No Content
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error al eliminar físicamente el usuario con ID {id}.");
+                return StatusCode(500, $"Error interno del servidor al eliminar físicamente el usuario con ID {id}.");
+            }
+        }
     }
 }
