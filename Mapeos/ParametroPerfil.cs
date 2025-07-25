@@ -27,6 +27,10 @@ namespace AnhApi.Mapeos
                 .ForMember(dest => dest.Sigla, opt => opt.MapFrom(src => src.sigla))
                 .ForMember(dest => dest.Grupo, opt => opt.MapFrom(src => src.grupo));
 
+            CreateMap<Parametro, ParametroCmbLit>()
+                .ForMember(dest => dest.Sigla, opt => opt.MapFrom(src => src.sigla))
+                .ForMember(dest => dest.Descripcion, opt => opt.MapFrom(src => src.descripcion));
+
             CreateMap<Parametro, ParametroCmb>()
                 .ForMember(dest => dest.Codigo, op => op.MapFrom(src => src.codigo))
                 .ForMember(dest => dest.Descripcion, op => op.MapFrom(src => src.descripcion));

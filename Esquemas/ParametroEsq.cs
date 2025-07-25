@@ -24,6 +24,17 @@ namespace AnhApi.Esquemas
 
     }
 
+
+    public class ParametroCmbLit
+    {
+        [Required]
+        public string Sigla { get; set; }
+
+        [Required]
+        [StringLength(120)]
+        public string Descripcion { get; set; }
+    }
+
     public class ParametroCmb
     {
         [Required]

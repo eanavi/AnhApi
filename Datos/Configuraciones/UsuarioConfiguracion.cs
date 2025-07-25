@@ -59,10 +59,16 @@ namespace AnhApi.Datos.Configuraciones
                     .HasMaxLength(15) // varchar(15)
                     .IsRequired(); // NOT NULL
 
-            // Si tienes una relación con Persona, puedes configurarla aquí
-            entity.HasOne(u => u.Persona) // Asumiendo que tienes una propiedad 'public Persona Persona { get; set; }' en Usuario
-                   .WithMany() // O .WithOne(p => p.Usuario) si la relación es 1 a 1
-                   .HasForeignKey(u => u.id_persona);
+            // Configuración de la relación con Persona
+            // Un Usuario tiene UNA Persona
+            entity.HasOne(u => u.Persona)
+                  // La Persona a la que este usuario apunta tiene un usuario asociado
+                  // (y como la FK en Usuario.id_persona es única, ese es el mismo Usuario)
+                  .WithOne(p => p.Usuario)
+                  .HasForeignKey<Usuario>(u => u.id_persona) // La clave foránea es 'id_persona' en la tabla 'usuario'
+                  .HasConstraintName("fk_persona_usuario") // Nombre opcional para la restricción
+                  .IsRequired(); // id_persona es NOT NULL en la tabla usuario
+
         }
     }
 }

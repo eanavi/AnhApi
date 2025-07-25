@@ -118,7 +118,7 @@ namespace AnhApi.Controladores
         {
             try
             {
-                var parametro = await _parametroServicio.ObtenerGrupo(grupo);
+                var parametro = await _parametroServicio.ObtenerGrupoCod(grupo);
                 if (parametro == null)
                 {
                     _logger.LogInformation($"Parametro con grupo {grupo} no encontrado");
@@ -133,6 +133,32 @@ namespace AnhApi.Controladores
                 return StatusCode(500, $"Error interno del servidor al obtener el grupo {grupo}");
             }
         }
+
+        [HttpGet("grupo_lit/{grupo}")]
+        [ProducesResponseType(typeof(IEnumerable<ParametroCmb>), 200)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(500)]
+        public async Task<ActionResult<IEnumerable<ParametroCmb>>> ObtenerGrupoLit(string grupo)
+        {
+            try
+            {
+                var parametro = await _parametroServicio.ObtenerGrupoCod(grupo);
+                if (parametro == null)
+                {
+                    _logger.LogInformation($"Parametro con grupo {grupo} no encontrado");
+                    return NotFound($"Grupo de parametros no encontrados");
+                }
+                var prmCmb = _mapper.Map<IEnumerable<ParametroCmbLit>>(parametro);
+                return Ok(prmCmb);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error al obtener el parametro");
+                return StatusCode(500, $"Error interno del servidor al obtener el grupo {grupo}");
+            }
+        }
+
+
 
         /// <summary>
         /// Crea un nuevo parámetro.

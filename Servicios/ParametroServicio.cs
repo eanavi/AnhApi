@@ -228,12 +228,13 @@ namespace AnhApi.Servicios
         /// </summary>
         /// <param name="grupo"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<Parametro>> ObtenerGrupo(string grupo)
+        public async Task<IEnumerable<Parametro>> ObtenerGrupoCod(string grupo)
         {
             try
             {
                 var query = _context.Set<Parametro>().AsQueryable();
-                query = query.Where(e => e.grupo == grupo && e.aud_estado == 0);
+                query = query.Where(e => e.grupo == grupo && e.aud_estado == 0)
+                    .OrderBy(e => e.codigo);
                 var paramExistentes = await query.ToListAsync();
                 return paramExistentes;
             }
@@ -243,5 +244,7 @@ namespace AnhApi.Servicios
                 throw;
             }
         }
+
+
     }
 }

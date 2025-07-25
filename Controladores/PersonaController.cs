@@ -4,6 +4,7 @@ using AnhApi.Servicios;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -42,6 +43,8 @@ namespace AnhApi.Controladores
         /// <returns>Una lista de PersonaListado.</returns>
         [HttpGet] // Ruta: GET api/personas
         [ProducesResponseType(typeof(PaginacionResultado<PersonaListado>), 200)] // Indica el tipo de retorno esperado
+        [EnableRateLimiting("fijo")]// Limita la tasa de solicitudes a este endpoint
+        [ProducesResponseType(429)]// Demasiadas peticiones
         [ProducesResponseType(400)]//Paginacion erronea
         [ProducesResponseType(401)]//No autorizado
         [ProducesResponseType(500)]

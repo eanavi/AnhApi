@@ -83,6 +83,20 @@ namespace AnhApi.Datos.Configuraciones
                   .HasColumnName("aud_ip")
                   .HasMaxLength(15) // varchar(45)
                   .IsRequired(true); // varchar(45) NULL
+
+            // Una Persona (p) puede tener UN Usuario (p.Usuario)
+            entity.HasOne(p => p.Usuario)
+                  // El Usuario (u) está relacionado con UNA Persona (u.Persona).
+                  // Aquí es donde establecemos el lado inverso de la relación.
+                  .WithOne(u => u.Persona)
+                  // La clave foránea 'id_persona' está en la entidad Usuario.
+                  .HasForeignKey<Usuario>(u => u.id_persona)
+                  // Nombre opcional para la restricción de la FK
+                  .HasConstraintName("fk_persona_usuario")
+                  // Esta FK es requerida porque Usuario.Persona no es nullable en tu modelo Usuario.
+                  // Esto significa que CADA Usuario DEBE tener una Persona.
+                  .IsRequired(); // Por defecto, si la FK es GUID y el modelo Persona es null!, es requerido.
+
         }
     }
 }

@@ -17,7 +17,8 @@ using Microsoft.Extensions.Logging.Abstractions;
 using System.Security.Cryptography;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using System.Reflection; // <-- Añadido para Assembly busqueda de servicios en los programas disponibles 
+using System.Reflection;
+using Microsoft.AspNetCore.RateLimiting; // <-- Añadido para Assembly busqueda de servicios en los programas disponibles 
 
 DotNetEnv.Env.Load();
 var entorno = Environment.GetEnvironmentVariable("ENTORNO_ASPNETCORE");
@@ -37,12 +38,14 @@ var configuracionLogger = new LoggerConfiguration()
 // Opciones del Servidor
 var builder = WebApplication.CreateBuilder(args);
 
+//Incluir la configuracion de los archivos de parametros de la aplicacion
 builder.Configuration
     .SetBasePath(Directory.GetCurrentDirectory())
     .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
     .AddJsonFile($"appsettings.{entorno}.json", optional: true, reloadOnChange: true)
     .AddEnvironmentVariables();
 
+// Configuracion de salida de los logs, podria ser diferente en desarrollo y produccion
 if (builder.Environment.IsDevelopment())
 {
     configuracionLogger.WriteTo.Console();
@@ -60,15 +63,19 @@ Log.Logger = configuracionLogger.CreateLogger();
 
 // Configuración de la base de datos
 builder.Services.Configure<BdPostgres>(builder.Configuration.GetSection("BDPosgres"));
+
+
 // Configuracion de las opciones LDAP 
 builder.Services.Configure<LdapOptions>(builder.Configuration.GetSection("LdapOptions"));
 
+// Configuración una unica instancia de BdPostgres para ser usada en toda la aplicación
 builder.Services.AddSingleton(sp =>
 {
     var options = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<BdPostgres>>();
     return options.Value;
 });
 
+// Configuración de las opciones de esquema de autenticación
 builder.Services.AddAuthentication(o =>
 {
     o.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -105,11 +112,26 @@ builder.Services.AddAuthentication(o =>
         };
     });
 
+// Configurar Entity Framework Core con PostgreSQL
 builder.Services.AddDbContext<AnhApi.Datos.AppDbContext>((serviceProvider, options) =>
 {
     var bdPostgres = serviceProvider.GetRequiredService<BdPostgres>();
     options.UseNpgsql(bdPostgres.GetConnectionString());
 });
+
+
+// Configurar la política de Demasiadas Solicitudes (Rate Limiting) abuso sobrecarga
+builder.Services.AddRateLimiter(options => {
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+
+    options.AddFixedWindowLimiter("fijo", opt =>
+    {
+        opt.PermitLimit = 50; // Número máximo de solicitudes permitidas
+        //opt.Window = TimeSpan.FromSeconds(20); // Ventana de tiempo de 5 segundos para prueba
+        opt.Window = TimeSpan.FromMinutes(1); // Ventana de tiempo de 1 minuto
+    });
+});
+
 
 
 // Configurar AutoMapper
@@ -227,7 +249,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
+app.UseRateLimiter();
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
