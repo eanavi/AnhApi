@@ -113,7 +113,7 @@ builder.Services.AddAuthentication(o =>
     });
 
 // Configurar Entity Framework Core con PostgreSQL
-builder.Services.AddDbContext<AnhApi.Datos.AppDbContext>((serviceProvider, options) =>
+builder.Services.AddDbContext<AnhApi.Datos.ContextoAppBD>((serviceProvider, options) =>
 {
     var bdPostgres = serviceProvider.GetRequiredService<BdPostgres>();
     options.UseNpgsql(bdPostgres.GetConnectionString());
@@ -140,7 +140,7 @@ builder.Services.AddAutoMapper(typeof(Program).Assembly);
 // --- Registro de servicios por convención los servicios a registrar empieza con I[NombreClaseServicio] ---
 // Registrar el servicio genérico IGenericoServicio<,> -> GenericoServicio<,>
 // Esta línea es crucial y se mantiene porque es un tipo genérico abierto.
-builder.Services.AddScoped(typeof(IGenericoServicio<,>), typeof(GenericoServicio<,>));
+builder.Services.AddScoped(typeof(IAuditoriaServicio<,>), typeof(AuditoriaServicio<,>));
 
 // Obtener todas las clases de servicio del ensamblado actual que no son abstractas ni genéricas abiertas.
 // Esto incluirá PersonaServicio, ParametroServicio, AuthServicio.

@@ -6,13 +6,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace AnhApi.Servicios
 {
-    public class UsuarioServicio : GenericoServicio<Usuario, long>
+    public class UsuarioServicio : AuditoriaServicio<Usuario, long>
     {
         private readonly IMapper _mapper;
-        private readonly AppDbContext _contexto;
+        private readonly ContextoAppBD _contexto;
         private readonly ILogger<UsuarioServicio> _logger;
 
-        public UsuarioServicio(AppDbContext contexto, ILogger<UsuarioServicio> logger, IMapper mapper) : base(contexto, logger)
+        public UsuarioServicio(ContextoAppBD contexto, ILogger<UsuarioServicio> logger, IMapper mapper) : base(contexto, logger)
         {
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
             _contexto = contexto ?? throw new ArgumentNullException(nameof(contexto));

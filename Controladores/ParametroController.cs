@@ -1,28 +1,26 @@
-﻿// Archivo: AnhApi.Controladores/ParametroController.cs
-using AnhApi.Esquemas;
-using AnhApi.Modelos;
-using AnhApi.Servicios; // Asegúrate de incluir este using
-using AutoMapper;
-using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿// Archivo: AnhApi.Api.Controladores/ParametroController.cs
+using AnhApi.Interfaces; // Para IParametroServicio, ILogger
+using AnhApi.Modelos.prm; // Para el modelo Parametro
+using AnhApi.Esquemas; // Para los DTOs PaisCreacion, PaisListado, PaisEsq, PaginacionResultado, PaginacionParametros
+using AnhApi.Servicios; // Para ParametroServicio
+using AutoMapper; // Para el mapeo entre modelos y DTOs
+using Microsoft.AspNetCore.Mvc; // Para [ApiController], [Route], ActionResult, etc.
+using Microsoft.Extensions.Logging; // Para ILogger
+using System.Security.Claims; // Para obtener información del usuario autenticado
 
-namespace AnhApi.Controladores
+namespace AnhApi.Api.Controladores
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/[controller]")] // La ruta base será /api/Parametro
+    // [Authorize] // Descomenta si este controlador requiere autenticación
     public class ParametroController : ControllerBase
     {
-        // Cambia la inyección para usar el servicio específico
-        private readonly ParametroServicio _parametroServicio; // <--- CAMBIO AQUÍ
+        private readonly ParametroServicio _parametroServicio;
         private readonly IMapper _mapper;
         private readonly ILogger<ParametroController> _logger;
 
         public ParametroController(
-            ParametroServicio parametroServicio, // <--- CAMBIO AQUÍ
+            ParametroServicio parametroServicio,
             IMapper mapper,
             ILogger<ParametroController> logger)
         {
@@ -31,18 +29,55 @@ namespace AnhApi.Controladores
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        // Los métodos dentro del controlador no necesitan cambiar su lógica de mapeo
-        // ni el manejo de errores, ya que la interfaz del servicio es similar.
-
         /// <summary>
-        /// Obtiene todos los parámetros activos.
+        /// Obtiene una lista paginada de parámetros activos.
         /// </summary>
-        /// <returns>Una lista de ParametroEsq.</returns>
-        [HttpGet]
-        [ProducesResponseType(typeof(IEnumerable<ParametroEsq>), 200)]
-        [ProducesResponseType(500)]
-        public async Task<ActionResult<PaginacionResultado<ParametroEsq>>> ObtenerTodosParametros(
-            [FromQuery] PaginacionParametros paginacion)
+        /// <param name="parametrosPaginacion">Parámetros para la paginación (número de página, tamaño de página).</param>
+        /// <returns>Un objeto paginado que contiene una lista de ParametroListado.</returns>
+        [HttpGet] // GET /api/Parametro
+        [ProducesResponseType(typeof(PaginacionResultado<PaisListado>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<PaginacionResultado<PaisListado>>> ObtenerParametrosPaginados(
+            [FromQuery] PaginacionParametros parametrosPaginacion)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    _logger.LogWarning("Parámetros de paginación inválidos.");
+                    return BadRequest(ModelState);
+                }
+
+                var resultadoPaginadoModelos = await _parametroServicio.ObtenerTodosPagAsync(parametrosPaginacion);
+
+                // Mapear los elementos del resultado paginado al DTO de listado
+                var parametrosListado = _mapper.Map<IEnumerable<ParametroListado>>(resultadoPaginadoModelos.Elementos);
+
+                var resultadoDto = new PaginacionResultado<ParametroListado>
+                {
+                    Elementos = parametrosListado,
+                    TotalRegistros = resultadoPaginadoModelos.TotalRegistros,
+                    PaginaActual = resultadoPaginadoModelos.PaginaActual,
+                    TamanoPagina = resultadoPaginadoModelos.TamanoPagina,
+                    TotalPaginas = resultadoPaginadoModelos.TotalPaginas
+                };
+
+                return Ok(resultadoDto);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al obtener parámetros paginados.");
+                return StatusCode(StatusCodes.Status500InternalServerError, "Error interno del servidor al obtener parámetros.");
+            }
+        }
+
+
+        [HttpGet("grupo")]
+        [ProducesResponseType(typeof(IEnumerable<ParametroCmb>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<IEnumerable<ParametroCmb>>> ObtenerGrupo([FromQuery] string grupo) 
         {
             try
             {
@@ -51,151 +86,86 @@ namespace AnhApi.Controladores
                     return BadRequest(ModelState);
                 }
 
-                var parametrosPag = await _parametroServicio.ObtenerTodosPagAsync(paginacion);
-
-                if (parametrosPag == null)
-                {
-                    return Ok(new List<ParametroEsq>());
-                }
-
-                var parametrosLista = _mapper.Map<IEnumerable<ParametroListado>>(parametrosPag.Elementos);
-                var resultado = new PaginacionResultado<ParametroListado>
-                {
-                    Elementos = parametrosLista,
-                    TotalRegistros = parametrosPag.TotalRegistros,
-                    PaginaActual = parametrosPag.PaginaActual,
-                    TamanoPagina = parametrosPag.TamanoPagina,
-                    TotalPaginas = parametrosPag.TotalPaginas
-                };
-         
-     
-                return Ok(resultado);
+                var grupoResultado = await _parametroServicio.ObtenerPorGrupo(grupo ?? "");
+                var lista = _mapper.Map<IEnumerable<ParametroCmb>>(grupoResultado);
+                return Ok(lista);
             }
-            catch (Exception ex)
+            catch (Exception es)
             {
-                _logger.LogError(ex, "Error al obtener todos los parámetros.");
-                return StatusCode(500, "Error interno del servidor al obtener parámetros.");
+                _logger.LogError(es, $"Error al obtener el grupo {grupo}");
+                return StatusCode(StatusCodes.Status500InternalServerError, $"Error interno del servidor al obtener el grupo {grupo}");
             }
         }
-
         
-
 
         /// <summary>
         /// Obtiene un parámetro por su ID.
         /// </summary>
         /// <param name="id">El ID del parámetro.</param>
-        /// <returns>Un ParametroEsq.</returns>
-        [HttpGet("{id:int}")]
-        [ProducesResponseType(typeof(ParametroEsq), 200)]
-        [ProducesResponseType(404)]
-        [ProducesResponseType(500)]
-        public async Task<ActionResult<ParametroEsq>> ObtenerParametroPorId(int id)
+        /// <returns>Un objeto ParametroEsq si se encuentra, o NotFound si no.</returns>
+        [HttpGet("{id}")] // GET /api/Parametro/{id}
+        [ProducesResponseType(typeof(PaisEsq), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<PaisEsq>> ObtenerParametroPorId(int id)
         {
             try
             {
                 var parametro = await _parametroServicio.ObtenerPorIdAsync(id);
                 if (parametro == null)
                 {
-                    _logger.LogInformation($"Parámetro con ID {id} no encontrado o no activo.");
+                    _logger.LogWarning($"Parámetro con ID {id} no encontrado.");
                     return NotFound($"Parámetro con ID {id} no encontrado.");
                 }
-                var parametroEsq = _mapper.Map<ParametroEsq>(parametro);
+                var parametroEsq = _mapper.Map<PaisEsq>(parametro);
                 return Ok(parametroEsq);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"Error al obtener el parámetro con ID {id}.");
-                return StatusCode(500, $"Error interno del servidor al obtener el parámetro con ID {id}.");
+                return StatusCode(StatusCodes.Status500InternalServerError, "Error interno del servidor al obtener el parámetro.");
             }
         }
-
-        [HttpGet("grupo/{grupo}")]
-        [ProducesResponseType(typeof(IEnumerable<ParametroCmb>), 200)]
-        [ProducesResponseType(404)]
-        [ProducesResponseType(500)]
-        public async Task<ActionResult<IEnumerable<ParametroCmb>>> ObtenerGrupo(string grupo)
-        {
-            try
-            {
-                var parametro = await _parametroServicio.ObtenerGrupoCod(grupo);
-                if (parametro == null)
-                {
-                    _logger.LogInformation($"Parametro con grupo {grupo} no encontrado");
-                    return NotFound($"Grupo de parametros no encontrados");
-                }
-                var prmCmb = _mapper.Map<IEnumerable<ParametroCmb>>(parametro);
-                return Ok(prmCmb);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Error al obtener el parametro");
-                return StatusCode(500, $"Error interno del servidor al obtener el grupo {grupo}");
-            }
-        }
-
-        [HttpGet("grupo_lit/{grupo}")]
-        [ProducesResponseType(typeof(IEnumerable<ParametroCmb>), 200)]
-        [ProducesResponseType(404)]
-        [ProducesResponseType(500)]
-        public async Task<ActionResult<IEnumerable<ParametroCmb>>> ObtenerGrupoLit(string grupo)
-        {
-            try
-            {
-                var parametro = await _parametroServicio.ObtenerGrupoCod(grupo);
-                if (parametro == null)
-                {
-                    _logger.LogInformation($"Parametro con grupo {grupo} no encontrado");
-                    return NotFound($"Grupo de parametros no encontrados");
-                }
-                var prmCmb = _mapper.Map<IEnumerable<ParametroCmbLit>>(parametro);
-                return Ok(prmCmb);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Error al obtener el parametro");
-                return StatusCode(500, $"Error interno del servidor al obtener el grupo {grupo}");
-            }
-        }
-
-
 
         /// <summary>
         /// Crea un nuevo parámetro.
         /// </summary>
-        /// <param name="parametroCreacionDto">Los datos del parámetro a crear.</param>
-        /// <returns>El ParametroEsq creado.</returns>
-        [HttpPost]
-        [ProducesResponseType(typeof(ParametroEsq), 201)]
-        [ProducesResponseType(400)]
-        [ProducesResponseType(500)]
-        public async Task<ActionResult<ParametroEsq>> CrearParametro(
-            [FromBody] ParametroCreacion parametroCreacionDto)
+        /// <param name="parametroCreacionDto">Datos del parámetro a crear.</param>
+        /// <returns>El parámetro creado con su ID y campos de auditoría.</returns>
+        [HttpPost] // POST /api/Parametro
+        [ProducesResponseType(typeof(PaisEsq), StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<PaisEsq>> CrearParametro([FromBody] PaisCreacion parametroCreacionDto)
         {
             try
             {
                 if (!ModelState.IsValid)
                 {
+                    _logger.LogWarning("Datos de creación de parámetro inválidos.");
                     return BadRequest(ModelState);
                 }
 
                 var parametroModel = _mapper.Map<Parametro>(parametroCreacionDto);
 
-                parametroModel.aud_estado = 0; //El valor por defecto para activo
+                // Asignar campos de auditoría (ejemplo, ajusta según tu lógica de obtención de usuario/IP)
+                // string usuario = User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "sistema";
+                // string ip = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "N/A";
+                string usuario = "test_user"; // Reemplaza con lógica real de autenticación/obtención de usuario
+                string ip = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "127.0.0.1"; // Reemplaza con lógica real de obtención de IP
 
+                var nuevoParametro = await _parametroServicio.CrearAsync(parametroModel);
+                var parametroEsq = _mapper.Map<PaisEsq>(nuevoParametro);
 
-                var parametroCreado = await _parametroServicio.CrearAsync(parametroModel);
-
-                var parametroEsq = _mapper.Map<ParametroEsq>(parametroCreado);
-
-                return CreatedAtAction(nameof(ObtenerParametroPorId),
-                                       new { id = parametroEsq.IdParametro },
-                                       parametroEsq);
+                return CreatedAtAction(
+                    nameof(ObtenerParametroPorId),
+                    new { id = parametroEsq.IdPais },
+                    parametroEsq);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error al crear un nuevo parámetro.");
-                return StatusCode(500, "Error interno del servidor al crear el parámetro.");
+                _logger.LogError(ex, "Error al crear el parámetro.");
+                return StatusCode(StatusCodes.Status500InternalServerError, "Error interno del servidor al crear el parámetro.");
             }
         }
 
@@ -203,76 +173,115 @@ namespace AnhApi.Controladores
         /// Actualiza un parámetro existente.
         /// </summary>
         /// <param name="id">El ID del parámetro a actualizar.</param>
-        /// <param name="parametroEsqDto">Los datos actualizados del parámetro.</param>
-        /// <returns>No Content si la actualización es exitosa.</returns>
-        [HttpPut("{id:int}")]
-        [ProducesResponseType(204)]
-        [ProducesResponseType(400)]
-        [ProducesResponseType(404)]
-        [ProducesResponseType(500)]
-        public async Task<ActionResult> ActualizarParametro(
-            int id,
-            [FromBody] ParametroEsq parametroEsqDto)
+        /// <param name="parametroEsqDto">Datos actualizados del parámetro.</param>
+        /// <returns>NoContent si la actualización fue exitosa, o NotFound/BadRequest.</returns>
+        [HttpPut("{id}")] // PUT /api/Parametro/{id}
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult> ActualizarParametro(int id, [FromBody] PaisEsq parametroEsqDto)
         {
             try
             {
-                if (id != parametroEsqDto.IdParametro)
+                if (id != parametroEsqDto.IdPais)
                 {
-                    return BadRequest("El ID de la ruta no coincide con el ID del cuerpo.");
+                    _logger.LogWarning($"Conflicto de ID: el ID de la ruta ({id}) no coincide con el ID del cuerpo ({parametroEsqDto.IdPais}).");
+                    return BadRequest("El ID de la ruta no coincide con el ID del cuerpo de la solicitud.");
                 }
 
                 if (!ModelState.IsValid)
                 {
+                    _logger.LogWarning("Datos de actualización de parámetro inválidos.");
                     return BadRequest(ModelState);
                 }
 
                 var parametroModel = _mapper.Map<Parametro>(parametroEsqDto);
 
-                // No necesitamos pasar usuario/IP a este servicio
-                var resultado = await _parametroServicio.ActualizarAsync(id, parametroModel);
-                if (!resultado)
+                // Asignar campos de auditoría (ejemplo, ajusta según tu lógica de obtención de usuario/IP)
+                // string usuario = User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "sistema";
+                // string ip = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "N/A";
+                string usuario = "test_user"; // Reemplaza con lógica real de autenticación/obtención de usuario
+                string ip = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "127.0.0.1"; // Reemplaza con lógica real de obtención de IP
+
+                var actualizado = await _parametroServicio.ActualizarAsync(id, parametroModel);
+                if (!actualizado)
                 {
-                    _logger.LogInformation($"No se pudo actualizar el parámetro con ID {id}. Podría no existir o no estar activo.");
-                    return NotFound($"Parámetro con ID {id} no encontrado o no se pudo actualizar.");
+                    _logger.LogWarning($"Parámetro con ID {id} no encontrado o no se pudo actualizar.");
+                    return NotFound($"Parámetro con ID {id} no encontrado o ya estaba inactivo.");
                 }
 
-                return NoContent();
+                return NoContent(); // 204 No Content indica éxito sin devolver un cuerpo
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"Error al actualizar el parámetro con ID {id}.");
-                return StatusCode(500, $"Error interno del servidor al actualizar el parámetro con ID {id}.");
+                return StatusCode(StatusCodes.Status500InternalServerError, "Error interno del servidor al actualizar el parámetro.");
             }
         }
 
         /// <summary>
-        /// Elimina lógicamente un parámetro (cambia su estado).
+        /// Elimina lógicamente un parámetro (cambia su estado de auditoría a inactivo).
         /// </summary>
         /// <param name="id">El ID del parámetro a eliminar.</param>
-        /// <returns>No Content si la eliminación es exitosa.</returns>
-        [HttpDelete("{id:int}")]
-        [ProducesResponseType(204)]
-        [ProducesResponseType(404)]
-        [ProducesResponseType(500)]
+        /// <returns>NoContent si la eliminación fue exitosa, o NotFound.</returns>
+        [HttpDelete("{id}")] // DELETE /api/Parametro/{id}
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult> EliminarParametro(int id)
         {
             try
             {
-                // No necesitamos pasar usuario/IP a este servicio
-                var resultado = await _parametroServicio.EliminarAsync(id);
+                // Asignar campos de auditoría (ejemplo, ajusta según tu lógica de obtención de usuario/IP)
+                // string usuario = User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "sistema";
+                // string ip = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "N/A";
+                string usuario = "test_user"; // Reemplaza con lógica real de autenticación/obtención de usuario
+                string ip = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "127.0.0.1"; // Reemplaza con lógica real de obtención de IP
 
-                if (!resultado)
+                var eliminado = await _parametroServicio.EliminarAsync(id);
+                if (!eliminado)
                 {
-                    _logger.LogInformation($"No se pudo eliminar el parámetro con ID {id}. Podría no existir.");
-                    return NotFound($"Parámetro con ID {id} no encontrado.");
+                    _logger.LogWarning($"Parámetro con ID {id} no encontrado o ya estaba eliminado/inactivo.");
+                    return NotFound($"Parámetro con ID {id} no encontrado o ya estaba inactivo.");
                 }
 
                 return NoContent();
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Error al eliminar el parámetro con ID {id}.");
-                return StatusCode(500, $"Error interno del servidor al eliminar el parámetro con ID {id}.");
+                _logger.LogError(ex, $"Error al eliminar lógicamente el parámetro con ID {id}.");
+                return StatusCode(StatusCodes.Status500InternalServerError, "Error interno del servidor al eliminar el parámetro.");
+            }
+        }
+
+        /// <summary>
+        /// Elimina físicamente un parámetro de la base de datos. ¡Usar con precaución!
+        /// </summary>
+        /// <param name="id">El ID del parámetro a eliminar físicamente.</param>
+        /// <returns>NoContent si la eliminación fue exitosa, o NotFound.</returns>
+        [HttpDelete("fisico/{id}")] // DELETE /api/Parametro/fisico/{id}
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult> EliminarParametroFisico(int id)
+        {
+            try
+            {
+                var parametroEliminado = await _parametroServicio.EliminarFisicoAsync(id);
+                if (parametroEliminado == null)
+                {
+                    _logger.LogWarning($"Parámetro con ID {id} no encontrado para eliminación física.");
+                    return NotFound($"Parámetro con ID {id} no encontrado.");
+                }
+
+                _logger.LogInformation($"Parámetro con ID {id} eliminado físicamente.");
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error al eliminar físicamente el parámetro con ID {id}.");
+                return StatusCode(StatusCodes.Status500InternalServerError, "Error interno del servidor al eliminar físicamente el parámetro.");
             }
         }
     }

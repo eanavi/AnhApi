@@ -88,10 +88,10 @@ namespace AnhApi.Controladores
         /// fecha de nacimiento en formato dd-mm-yyyy para no confundir al enrutador</param>
         /// <returns>lista de Personas</returns>
         [HttpGet("buscar")] // Ruta: GET api/personas/buscar?criterio=...&PaginaNumero=...&TamanoPagina=...
-        [ProducesResponseType(typeof(PaginacionResultado<PersonaListado>), 200)]
-        [ProducesResponseType(400)]
-        [ProducesResponseType(401)]
-        [ProducesResponseType(500)]
+        [ProducesResponseType(typeof(PaginacionResultado<PersonaListado>), StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<PaginacionResultado<PersonaListado>>> BuscarPaginado(
             [FromQuery] string? criterio, // Criterio de búsqueda, puede ser opcional
             [FromQuery] PaginacionParametros parametrosPaginacion)
@@ -121,9 +121,9 @@ namespace AnhApi.Controladores
         /// <param name="id">El ID de la persona (Guid).</param>
         /// <returns>Un objeto Persona (DTO completo).</returns>
         [HttpGet("{id:guid}")] // Ruta: GET api/personas/{id} - Usamos :guid para validar el formato Guid en la ruta
-        [ProducesResponseType(typeof(Persona), 200)] // El DTO completo
-        [ProducesResponseType(404)]
-        [ProducesResponseType(500)]
+        [ProducesResponseType(typeof(Persona), StatusCodes.Status200OK)] // El DTO completo
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<Persona>> ObtenerPersonaPorId(Guid id)
         {
             try
@@ -152,9 +152,9 @@ namespace AnhApi.Controladores
         /// <param name="personaCreacionDto">Los datos de la persona a crear.</param>
         /// <returns>La Persona (DTO completo) creada.</returns>
         [HttpPost] // Ruta: POST api/personas
-        [ProducesResponseType(typeof(Persona), 201)] // Devuelve el DTO completo de la persona creada
-        [ProducesResponseType(400)]
-        [ProducesResponseType(500)]
+        [ProducesResponseType(typeof(Persona),StatusCodes.Status201Created)] // Devuelve el DTO completo de la persona creada
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<Persona>> CrearPersona(
             [FromBody] PersonaCreacion personaCreacionDto)
         {
@@ -198,10 +198,10 @@ namespace AnhApi.Controladores
         /// <param name="personaDto">Los datos actualizados de la persona (DTO completo).</param>
         /// <returns>No Content si la actualización es exitosa.</returns>
         [HttpPut("{id:guid}")] // Ruta: PUT api/personas/{id}
-        [ProducesResponseType(204)] // No Content
-        [ProducesResponseType(400)] // Bad Request (si el ID no coincide o DTO inválido)
-        [ProducesResponseType(404)] // Not Found
-        [ProducesResponseType(500)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult> ActualizarPersona([FromRoute] Guid id,
             [FromBody] PersonaEsq personaDto) // Recibe el DTO completo para la actualización
         {
@@ -247,9 +247,9 @@ namespace AnhApi.Controladores
         /// <param name="id">El ID de la persona a eliminar.</param>
         /// <returns>No Content si la eliminación es exitosa.</returns>
         [HttpDelete("{id:guid}")] // Ruta: DELETE api/personas/{id}
-        [ProducesResponseType(204)] // No Content
-        [ProducesResponseType(404)] // Not Found
-        [ProducesResponseType(500)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult> EliminarPersona(Guid id)
         {
             try

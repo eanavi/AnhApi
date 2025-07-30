@@ -41,10 +41,10 @@ namespace AnhApi.Controladores
         /// </summary>
         /// <returns>Una lista de UsuarioListado.</returns>
         [HttpGet] // Ruta: GET api/usuarios
-        [ProducesResponseType(typeof(IEnumerable<UsuarioListado>), 200)]
-        [ProducesResponseType(401)] // Unauthorized
-        [ProducesResponseType(400)] // Bad Request (validación de modelo)
-        [ProducesResponseType(500)]
+        [ProducesResponseType(typeof(IEnumerable<UsuarioListado>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)] // Unauthorized
+        [ProducesResponseType(StatusCodes.Status400BadRequest)] // Bad Request (validación de modelo)
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<IEnumerable<UsuarioListado>>> ObtenerTodosUsuarios(
             [FromQuery]PaginacionParametros paginacion)
         {
@@ -86,10 +86,10 @@ namespace AnhApi.Controladores
         /// <param name="id">El ID del usuario (long).</param>
         /// <returns>Un objeto UsuarioEsq (DTO completo).</returns>
         [HttpGet("{id:long}")] // Ruta: GET api/usuarios/{id}
-        [ProducesResponseType(typeof(UsuarioEsq), 200)]
-        [ProducesResponseType(401)] // Unauthorized
-        [ProducesResponseType(404)] // Not Found
-        [ProducesResponseType(500)]
+        [ProducesResponseType(typeof(UsuarioEsq), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)] // Unauthorized
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<UsuarioEsq>> ObtenerUsuarioPorId(long id)
         {
             try
@@ -117,10 +117,10 @@ namespace AnhApi.Controladores
         /// <param name="login">El login del usuario que puede ser nombre_de_usuario o correo.</param>
         /// <returns>Un objeto UsuarioEsq (DTO completo).</returns>
         [HttpGet("login/{login}")] // Ruta: GET api/usuarios/login/{login}
-        [ProducesResponseType(typeof(UsuarioEsq), 200)]
-        [ProducesResponseType(401)] // Unauthorized
-        [ProducesResponseType(404)] // Not Found
-        [ProducesResponseType(500)]
+        [ProducesResponseType(typeof(UsuarioEsq), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)] // Unauthorized
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<UsuarioEsq>> ObtenerUsuarioPorLogin(string login)
         {
             try
@@ -149,11 +149,11 @@ namespace AnhApi.Controladores
         /// <returns>El UsuarioEsq creado.</returns>
         [HttpPost] // Ruta: POST api/usuarios
         //[Authorize(Roles = "Administrador")] // Solo administradores pueden crear usuarios
-        [ProducesResponseType(typeof(UsuarioEsq), 201)]
-        [ProducesResponseType(400)] // Bad Request (validación de modelo)
-        [ProducesResponseType(401)] // Unauthorized
-        [ProducesResponseType(403)] // Forbidden (si no tiene el rol)
-        [ProducesResponseType(500)]
+        [ProducesResponseType(typeof(UsuarioEsq), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)] // Bad Request (validación de modelo)
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)] // Unauthorized
+        [ProducesResponseType(StatusCodes.Status403Forbidden)] // Forbidden (si no tiene el rol)
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<UsuarioEsq>> CrearUsuario(
             [FromBody] UsuarioCreacion usuarioCreacionDto)
         {
@@ -193,12 +193,12 @@ namespace AnhApi.Controladores
         /// <returns>No Content si la actualización es exitosa.</returns>
         [HttpPut("{id:long}")] // Ruta: PUT api/usuarios/{id}
         [Authorize(Roles = "Administrador")] // Solo administradores pueden actualizar usuarios
-        [ProducesResponseType(204)] // No Content
-        [ProducesResponseType(400)] // Bad Request (si el ID no coincide o DTO inválido)
-        [ProducesResponseType(401)] // Unauthorized
-        [ProducesResponseType(403)] // Forbidden
-        [ProducesResponseType(404)] // Not Found
-        [ProducesResponseType(500)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)] // No Content
+        [ProducesResponseType(StatusCodes.Status400BadRequest)] // Bad Request (si el ID no coincide o DTO inválido)
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)] // Unauthorized
+        [ProducesResponseType(StatusCodes.Status403Forbidden)] // Forbidden
+        [ProducesResponseType(StatusCodes.Status404NotFound)] // Not Found
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult> ActualizarUsuario(
             long id,
             [FromBody] UsuarioEsq usuarioEsqDto)
@@ -247,11 +247,11 @@ namespace AnhApi.Controladores
         /// <returns>No Content si la eliminación es exitosa.</returns>
         [HttpDelete("{id:long}")] // Ruta: DELETE api/usuarios/{id}
         [Authorize(Roles = "Administrador")] // Solo administradores pueden eliminar
-        [ProducesResponseType(204)] // No Content
-        [ProducesResponseType(401)] // Unauthorized
-        [ProducesResponseType(403)] // Forbidden
-        [ProducesResponseType(404)] // Not Found
-        [ProducesResponseType(500)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)] // No Content
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)] // Unauthorized
+        [ProducesResponseType(StatusCodes.Status403Forbidden)] // Forbidden
+        [ProducesResponseType(StatusCodes.Status404NotFound)] // Not Found
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult> EliminarUsuario(long id)
         {
             try
@@ -287,11 +287,11 @@ namespace AnhApi.Controladores
         /// <returns>No Content si la eliminación es exitosa.</returns>
         [HttpDelete("fisico/{id:long}")] // Ruta: DELETE api/usuarios/fisico/{id}
         //[Authorize(Roles = "Administrador")] // Solo administradores pueden eliminar físicamente
-        [ProducesResponseType(204)] // No Content
-        [ProducesResponseType(401)] // Unauthorized
-        [ProducesResponseType(403)] // Forbidden
-        [ProducesResponseType(404)] // Not Found
-        [ProducesResponseType(500)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)] // No Content
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)] // Unauthorized
+        [ProducesResponseType(StatusCodes.Status403Forbidden)] // Forbidden
+        [ProducesResponseType(StatusCodes.Status404NotFound)] // Not Found
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult> EliminarUsuarioFisico(long id)
         {
             try

@@ -5,10 +5,80 @@ using System.Linq;
 using AutoMapper;
 
 using AnhApi.Datos;
-using AnhApi.Modelos;
 using AnhApi.Esquemas;
+using AnhApi.Modelos.prm;
+using AnhApi.Interfaces;
 
+namespace AnhApi.Servicios
+{
+    public class ParametroServicio : GenericoServicio<Parametro, int>
+    {
+        private readonly ContextoAppBD _contextoBd;
+        private readonly ILogger<ParametroServicio> _logger;
+        private readonly IMapper _mapper;
 
+        public ParametroServicio(ContextoAppBD contexto, ILogger<ParametroServicio> logger, IMapper mapper) : base(contexto, logger)
+        {
+            _contextoBd = contexto ?? throw new ArgumentNullException(nameof(contexto));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+        }
+
+        public async Task<IEnumerable<Parametro>> ObtenerPorGrupo(string grupo)
+        {
+            try
+            {
+                var query = _contextoBd.Set<Parametro>().AsQueryable();
+                query = query.Where(e => e.grupo == grupo && e.aud_estado == 0)
+                             .OrderBy(e => e.codigo);
+                return await query.ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al recuperar el grupo {grupo}.", grupo);
+                throw;
+            }
+        }
+
+        /*
+        public async Task<PaginacionResultado<ParametroListado>> ObtenerParametroPag(PaginacionParametros paginacion)
+        {
+            try
+            {
+                if (paginacion == null)
+                {
+                    paginacion = new PaginacionParametros(); // Asigna valores por defecto si es nulo
+                }
+                IQueryable<Parametro> query = _contextoBd.Set<Parametro>().AsQueryable();
+                query = query.Where(e => e.aud_estado == 0);
+                var totalRegistros = await query.CountAsync();
+                var resultado = await query
+                    .Skip(paginacion.ElementosAOmitir)
+                    .Take(paginacion.TamanoPagina)
+                    .ToListAsync();
+                var resultadoMapeado = _mapper.Map<IEnumerable<ParametroListado>>(resultado);
+                return new PaginacionResultado<ParametroListado>
+                {
+                    Elementos = resultadoMapeado,
+                    TotalRegistros = totalRegistros,
+                    PaginaActual = paginacion.PaginaNumero,
+                    TamanoPagina = paginacion.TamanoPagina,
+                    TotalPaginas = (int)Math.Ceiling((double)totalRegistros / paginacion.TamanoPagina)
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al obtener los registros de Parametro con paginación.");
+                throw; // Rethrow the exception after logging
+            }
+
+        }
+
+        */
+    }
+}
+
+/*
 namespace AnhApi.Servicios
 {
 
@@ -21,12 +91,12 @@ namespace AnhApi.Servicios
     /// </summary>
     public class ParametroServicio
     {
-        private readonly AppDbContext _context;
+        private readonly ContextoAppBD _context;
         private readonly ILogger<ParametroServicio> _logger;
 
 
         //Constructor de la clase
-        public ParametroServicio(AppDbContext context, ILogger<ParametroServicio> logger)
+        public ParametroServicio(ContextoAppBD context, ILogger<ParametroServicio> logger)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -248,3 +318,4 @@ namespace AnhApi.Servicios
 
     }
 }
+*/

@@ -18,15 +18,15 @@ namespace AnhApi.Servicios
 {
     public class AuthServicio : IAuthServicio    
     {
-        private readonly AppDbContext _context;
+        private readonly ContextoAppBD _contextoBd;
         private readonly IConfiguration _configuration;
         private readonly ILogger<AuthServicio> _logger;
         private readonly LdapOptions _ldapOptions;
         private readonly string _dominio = "@ANH.GOB.BO";
 
-        public AuthServicio(AppDbContext context, IConfiguration configuration, ILogger<AuthServicio> logger, IOptions<LdapOptions> ldapOptionsAccessor)
+        public AuthServicio(ContextoAppBD context, IConfiguration configuration, ILogger<AuthServicio> logger, IOptions<LdapOptions> ldapOptionsAccessor)
         {
-            _context = context ?? throw new ArgumentNullException(nameof(context));
+            _contextoBd = context ?? throw new ArgumentNullException(nameof(context));
             _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _ldapOptions = ldapOptionsAccessor.Value ?? throw new ArgumentNullException(nameof(ldapOptionsAccessor), "LdapOptions no pueden ser nulas.");
@@ -54,7 +54,7 @@ namespace AnhApi.Servicios
 
                 if (esUsuarioLocal)
                 {
-                    var usuarioLocal = await _context.Usuarios.FirstOrDefaultAsync(u => u.login == request.Login);
+                    var usuarioLocal = await _contextoBd.Usuarios.FirstOrDefaultAsync(u => u.login == request.Login);
 
                     if (usuarioLocal != null && BCrypt.Net.BCrypt.Verify(request.Clave, usuarioLocal.clave))
                     {
@@ -78,7 +78,7 @@ namespace AnhApi.Servicios
                     if(await AutenticarJson(nombreUsuarioLdap, request.Clave))
                     //if(await AutenticarConLdapAsync(nombreUsuarioLdap, request.Clave))
                     {
-                        var usuarioAD = await _context.Usuarios.FirstOrDefaultAsync(u => u.login.ToUpper() == nombreUsuarioLdap);
+                        var usuarioAD = await _contextoBd.Usuarios.FirstOrDefaultAsync(u => u.login.ToUpper() == nombreUsuarioLdap);
 
                         if (usuarioAD == null)
                         {//Esta en Active Directory  pero no en la bd ***preguntar

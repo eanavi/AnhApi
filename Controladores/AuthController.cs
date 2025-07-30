@@ -24,10 +24,10 @@ namespace AnhApi.Controladores
 
 
         [HttpPost("login")]//Ruta completa api/auth/login
-        [ProducesResponseType(typeof(LoginResponse),200)] //ok
-        [ProducesResponseType(400)] //Error (validacion de modelo)
-        [ProducesResponseType(401)] //No autorizado (credenciales ivalidas)
-        [ProducesResponseType(500)] //Error Interno de servidor
+        [ProducesResponseType(typeof(LoginResponse),StatusCodes.Status200OK)] //ok
+        [ProducesResponseType(StatusCodes.Status400BadRequest)] //Error (validacion de modelo)
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)] //No autorizado (credenciales ivalidas)
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)] //Error Interno de servidor
         [AllowAnonymous]
         public async Task<ActionResult<LoginResponse>> Login([FromBody] LoginRequest request)
         {

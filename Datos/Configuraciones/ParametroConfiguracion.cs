@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using AnhApi.Modelos; 
+using AnhApi.Modelos.prm;
 
 namespace AnhApi.Datos.Configuraciones
 {
@@ -24,7 +24,7 @@ namespace AnhApi.Datos.Configuraciones
 
             entity.Property(e => e.descripcion)
                     .HasColumnName("descripcion")
-                    .HasMaxLength(120) // varchar(120)
+                    .HasMaxLength(250) // varchar(250)
                     .IsRequired(); // NOT NULL
 
             entity.Property(e => e.sigla)
@@ -38,7 +38,7 @@ namespace AnhApi.Datos.Configuraciones
 
             entity.Property(e => e.aud_estado)
                     .HasColumnName("aud_estado")
-                    .IsRequired(false) // int4 DEFAULT 0 NULL -> Es NULLable en la BD
+                    .IsRequired(true) // int4 DEFAULT 0 NULL -> Es NULLable en la BD
                     .HasDefaultValue(0); // Coincide con el DEFAULT 0 de la tabla
         }
     }

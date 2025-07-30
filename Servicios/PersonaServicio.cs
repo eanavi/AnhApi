@@ -11,13 +11,13 @@ using AutoMapper;
 
 namespace AnhApi.Servicios
 {
-    public class PersonaServicio : GenericoServicio<Persona, Guid>
+    public class PersonaServicio : AuditoriaServicio<Persona, Guid>
     {
-        private readonly AppDbContext _contexto; 
+        private readonly ContextoAppBD _contexto; 
         private readonly ILogger<PersonaServicio> _logger;
         private readonly IMapper _mapper;
 
-        public PersonaServicio(AppDbContext contexto, ILogger<PersonaServicio> logger, IMapper mapper)
+        public PersonaServicio(ContextoAppBD contexto, ILogger<PersonaServicio> logger, IMapper mapper)
             : base(contexto, logger) // Llama al constructor de GenericoServicio
         {
             _contexto = contexto;

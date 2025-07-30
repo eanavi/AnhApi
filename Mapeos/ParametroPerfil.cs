@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using AnhApi.Modelos;
 using AnhApi.Esquemas;
+using AnhApi.Modelos.prm;
 
 
 namespace AnhApi.Mapeos
