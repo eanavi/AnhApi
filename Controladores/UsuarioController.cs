@@ -1,6 +1,6 @@
 ﻿using AnhApi.Esquemas; // Para los DTOs de Usuario
 using AnhApi.Modelos;   // Para el modelo de base de datos Usuario
-using AnhApi.Servicios; // Para UsuarioServicio (que hereda de GenericoServicio)
+using AnhApi.Interfaces; // Para UsuarioServicio (que hereda de GenericoServicio)
 using AutoMapper;       // Para IMapper
 using Microsoft.AspNetCore.Mvc; // Para el controlador y los atributos de HTTP
 using Microsoft.Extensions.Logging; // Para ILogger
@@ -20,13 +20,13 @@ namespace AnhApi.Controladores
     [Authorize] // Protege todas las rutas de este controlador por defecto (requiere JWT)
     public class UsuarioController : ControllerBase
     {
-        private readonly UsuarioServicio _usuarioServicio; // Inyectamos el servicio específico de Usuario
+        private readonly IServicioUsuario _usuarioServicio; // Inyectamos el servicio específico de Usuario
         private readonly IMapper _mapper;
         private readonly ILogger<UsuarioController> _logger;
 
         // Constructor con inyección de dependencias
         public UsuarioController(
-            UsuarioServicio usuarioServicio,
+            IServicioUsuario usuarioServicio,
             IMapper mapper,
             ILogger<UsuarioController> logger)
         {
@@ -86,11 +86,11 @@ namespace AnhApi.Controladores
         /// <param name="id">El ID del usuario (long).</param>
         /// <returns>Un objeto UsuarioEsq (DTO completo).</returns>
         [HttpGet("{id:long}")] // Ruta: GET api/usuarios/{id}
-        [ProducesResponseType(typeof(UsuarioEsq), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(EsqUsuario), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)] // Unauthorized
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<UsuarioEsq>> ObtenerUsuarioPorId(long id)
+        public async Task<ActionResult<EsqUsuario>> ObtenerUsuarioPorId([FromRoute] long id)
         {
             try
             {
@@ -100,7 +100,7 @@ namespace AnhApi.Controladores
                     _logger.LogInformation($"Usuario con ID {id} no encontrado o no activo.");
                     return NotFound($"Usuario con ID {id} no encontrado.");
                 }
-                var usuarioDto = _mapper.Map<UsuarioEsq>(usuario);
+                var usuarioDto = _mapper.Map<EsqUsuario>(usuario);
                 return Ok(usuarioDto);
             }
             catch (Exception ex)
@@ -116,12 +116,12 @@ namespace AnhApi.Controladores
         /// </summary>
         /// <param name="login">El login del usuario que puede ser nombre_de_usuario o correo.</param>
         /// <returns>Un objeto UsuarioEsq (DTO completo).</returns>
-        [HttpGet("login/{login}")] // Ruta: GET api/usuarios/login/{login}
-        [ProducesResponseType(typeof(UsuarioEsq), StatusCodes.Status200OK)]
+        [HttpGet("login/{login:alpha}")] // Ruta: GET api/usuarios/login/{login}
+        [ProducesResponseType(typeof(EsqUsuario), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)] // Unauthorized
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<UsuarioEsq>> ObtenerUsuarioPorLogin(string login)
+        public async Task<ActionResult<EsqUsuario>> ObtenerUsuarioPorLogin([FromRoute] string login)
         {
             try
             {
@@ -149,12 +149,12 @@ namespace AnhApi.Controladores
         /// <returns>El UsuarioEsq creado.</returns>
         [HttpPost] // Ruta: POST api/usuarios
         //[Authorize(Roles = "Administrador")] // Solo administradores pueden crear usuarios
-        [ProducesResponseType(typeof(UsuarioEsq), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(EsqUsuario), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)] // Bad Request (validación de modelo)
         [ProducesResponseType(StatusCodes.Status401Unauthorized)] // Unauthorized
         [ProducesResponseType(StatusCodes.Status403Forbidden)] // Forbidden (si no tiene el rol)
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<UsuarioEsq>> CrearUsuario(
+        public async Task<ActionResult<EsqUsuario>> CrearUsuario(
             [FromBody] UsuarioCreacion usuarioCreacionDto)
         {
             try
@@ -200,8 +200,8 @@ namespace AnhApi.Controladores
         [ProducesResponseType(StatusCodes.Status404NotFound)] // Not Found
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult> ActualizarUsuario(
-            long id,
-            [FromBody] UsuarioEsq usuarioEsqDto)
+            [FromRoute] long id,
+            [FromBody] EsqUsuario usuarioEsqDto)
         {
             try
             {
@@ -252,7 +252,7 @@ namespace AnhApi.Controladores
         [ProducesResponseType(StatusCodes.Status403Forbidden)] // Forbidden
         [ProducesResponseType(StatusCodes.Status404NotFound)] // Not Found
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> EliminarUsuario(long id)
+        public async Task<ActionResult> EliminarUsuario([FromRoute] long id)
         {
             try
             {
@@ -292,7 +292,7 @@ namespace AnhApi.Controladores
         [ProducesResponseType(StatusCodes.Status403Forbidden)] // Forbidden
         [ProducesResponseType(StatusCodes.Status404NotFound)] // Not Found
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> EliminarUsuarioFisico(long id)
+        public async Task<ActionResult> EliminarUsuarioFisico([FromRoute] long id)
         {
             try
             {

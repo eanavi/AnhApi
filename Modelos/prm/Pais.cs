@@ -18,5 +18,7 @@ namespace AnhApi.Modelos.prm
 
         // Codigo de pais iso 3166-1 alfa-numeric (int4 NOT NULL)
         public int codigo_internacional { get; set; }
+
+        public ICollection<Departamento> Departamentos { get; set; } = new List<Departamento>();
     }
 }

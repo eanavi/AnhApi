@@ -1,6 +1,6 @@
 ﻿using AnhApi.Esquemas; 
 using AnhApi.Modelos;
-using AnhApi.Servicios;
+using AnhApi.Interfaces;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -22,11 +22,11 @@ namespace AnhApi.Controladores
     {
         private readonly IMapper _mapper;
         private readonly ILogger<PersonaController> _logger;
-        private readonly PersonaServicio _personaServ;
+        private readonly IServicioPersona _personaServ;
 
         // Constructor con inyección de dependencias
         public PersonaController(
-            PersonaServicio personaServ,
+            IServicioPersona personaServ,
             IMapper mapper,
             ILogger<PersonaController> logger)
         {
@@ -87,13 +87,13 @@ namespace AnhApi.Controladores
         /// carnet de identidad que son numeros
         /// fecha de nacimiento en formato dd-mm-yyyy para no confundir al enrutador</param>
         /// <returns>lista de Personas</returns>
-        [HttpGet("buscar")] // Ruta: GET api/personas/buscar?criterio=...&PaginaNumero=...&TamanoPagina=...
+        [HttpGet("buscar/{criterio:alpha}")] // Ruta: GET api/personas/buscar/criterio?PaginaNumero=...&TamanoPagina=...
         [ProducesResponseType(typeof(PaginacionResultado<PersonaListado>), StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<PaginacionResultado<PersonaListado>>> BuscarPaginado(
-            [FromQuery] string? criterio, // Criterio de búsqueda, puede ser opcional
+            [FromRoute] string? criterio, // Criterio de búsqueda, puede ser opcional
             [FromQuery] PaginacionParametros parametrosPaginacion)
         {
             try
@@ -124,7 +124,7 @@ namespace AnhApi.Controladores
         [ProducesResponseType(typeof(Persona), StatusCodes.Status200OK)] // El DTO completo
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<Persona>> ObtenerPersonaPorId(Guid id)
+        public async Task<ActionResult<Persona>> ObtenerPersonaPorId([FromRoute] Guid id)
         {
             try
             {
@@ -203,7 +203,7 @@ namespace AnhApi.Controladores
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult> ActualizarPersona([FromRoute] Guid id,
-            [FromBody] PersonaEsq personaDto) // Recibe el DTO completo para la actualización
+            [FromBody] EsqPersona personaDto) // Recibe el DTO completo para la actualización
         {
             try
             {
@@ -250,7 +250,7 @@ namespace AnhApi.Controladores
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> EliminarPersona(Guid id)
+        public async Task<ActionResult> EliminarPersona([FromRoute] Guid id)
         {
             try
             {

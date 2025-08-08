@@ -4,13 +4,14 @@ using AnhApi.Modelos;
 using AnhApi.Nucleo;
 using AnhApi.Servicios;
 using AnhApi.Interfaces;
+using AnhApi.Controladores;
 using AutoMapper; // Necesario para AutoMapper
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.OpenApi.Models;
-using Serilog;
+using Serilog; // Necesario para usar Log.Information()
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -18,7 +19,8 @@ using System.Security.Cryptography;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System.Reflection;
-using Microsoft.AspNetCore.RateLimiting; // <-- Añadido para Assembly busqueda de servicios en los programas disponibles 
+using Microsoft.AspNetCore.RateLimiting;
+using System.Diagnostics; // <-- Añadido para Assembly busqueda de servicios en los programas disponibles
 
 DotNetEnv.Env.Load();
 var entorno = Environment.GetEnvironmentVariable("ENTORNO_ASPNETCORE");
@@ -28,7 +30,7 @@ if (!string.IsNullOrWhiteSpace(entorno))
 }
 
 var configuracionLogger = new LoggerConfiguration()
-    .MinimumLevel.Debug()
+    .MinimumLevel.Debug() // Asegura que los mensajes Debug/Information sean capturados
     .Enrich.FromLogContext()
     .Enrich.WithProperty("ApplicationName", "AnhApi")
     .Enrich.WithProperty("MchineName", Environment.MachineName)
@@ -48,7 +50,7 @@ builder.Configuration
 // Configuracion de salida de los logs, podria ser diferente en desarrollo y produccion
 if (builder.Environment.IsDevelopment())
 {
-    configuracionLogger.WriteTo.Console();
+    configuracionLogger.WriteTo.Console(); // Escribe a la consola en desarrollo
 }
 else
 {
@@ -59,13 +61,13 @@ else
         outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss} [{Level:u3}] {Message:lj}{NewLine}{Exception}");
 }
 
-Log.Logger = configuracionLogger.CreateLogger();
+Log.Logger = configuracionLogger.CreateLogger(); // Configura el logger estático de Serilog
 
 // Configuración de la base de datos
 builder.Services.Configure<BdPostgres>(builder.Configuration.GetSection("BDPosgres"));
 
 
-// Configuracion de las opciones LDAP 
+// Configuracion de las opciones LDAP
 builder.Services.Configure<LdapOptions>(builder.Configuration.GetSection("LdapOptions"));
 
 // Configuración una unica instancia de BdPostgres para ser usada en toda la aplicación
@@ -140,30 +142,25 @@ builder.Services.AddAutoMapper(typeof(Program).Assembly);
 // --- Registro de servicios por convención los servicios a registrar empieza con I[NombreClaseServicio] ---
 // Registrar el servicio genérico IGenericoServicio<,> -> GenericoServicio<,>
 // Esta línea es crucial y se mantiene porque es un tipo genérico abierto.
-builder.Services.AddScoped(typeof(IAuditoriaServicio<,>), typeof(AuditoriaServicio<,>));
+builder.Services.AddScoped(typeof(IServicioAuditoria<,>), typeof(ServicioAuditoria<,>));
 
-// Obtener todas las clases de servicio del ensamblado actual que no son abstractas ni genéricas abiertas.
-// Esto incluirá PersonaServicio, ParametroServicio, AuthServicio.
+//Inyeccion de dependencias por convencion  --------  Registra todos los servicios que se inicien con "Servicio"
 var servicios = typeof(Program).Assembly.GetTypes()
-    .Where(t => t.Name.EndsWith("Servicio") && t.IsClass && !t.IsAbstract && !t.IsGenericTypeDefinition);
+    .Where(t => t.Name.StartsWith("Servicio") && t.IsClass && !t.IsAbstract && !t.IsGenericTypeDefinition);
 
+//Inyeccion de dependencias por convencion --------  Registra todos los servicios que se inicien con "Iservicio"
+//esto se puede cambiar para un entorno de pruebas o desarrollo
 foreach (var servicio in servicios)
 {
-    // Buscar una interfaz que siga la convención I[NombreClaseServicio] (ej. IAuthServicio para AuthServicio)
     var interfaz = servicio.GetInterfaces().FirstOrDefault(i =>
-        i.Name == $"I{servicio.Name}");
+        i.Name == $"I{servicio.Name}"); 
 
     if (interfaz != null)
     {
-        // Si la interfaz se encuentra (ej. IAuthServicio), se registra la implementación de la interfaz
         builder.Services.AddScoped(interfaz, servicio);
     }
     else
     {
-        // Si no se encuentra una interfaz I[NombreClaseServicio] (ej. PersonaServicio no tiene IPersonaServicio,
-        // pero hereda de IGenericoServicio<,> o ParametroServicio que no tiene interfaz personalizada),
-        // se registra la clase de servicio directamente.
-        // Esto permite la inyección directa por el tipo concreto si no hay una interfaz específica o si se hereda.
         builder.Services.AddScoped(servicio);
     }
 }
@@ -188,7 +185,7 @@ builder.Services.AddControllers()
 // Configurar Swagger/OpenAPI
 builder.Services.AddEndpointsApiExplorer();
 
-//Incluir logging
+//Incluir logging (esto configura el logging para ILogger<T> inyectado en otras clases)
 builder.Services.AddLogging(logging =>
 {
     logging.AddConsole();

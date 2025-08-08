@@ -3,8 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;
 using AnhApi.Esquemas;
-using AnhApi.Servicios;
 using Microsoft.AspNetCore.Authorization;
+using AnhApi.Interfaces;
 
 namespace AnhApi.Controladores
 {
@@ -13,12 +13,13 @@ namespace AnhApi.Controladores
     [Route("api/auth")]
     public class AuthController : ControllerBase
     {
-        private readonly IAuthServicio _authServicio;
+
+        private readonly IServicioAuth _servicioAuth;
         private readonly ILogger<AuthController> _logger;
 
-        public AuthController(IAuthServicio authServicio, ILogger<AuthController> logger)
+        public AuthController(IServicioAuth authServicio, ILogger<AuthController> logger)
         {
-            _authServicio = authServicio ?? throw new ArgumentNullException(nameof(authServicio));
+            _servicioAuth = authServicio ?? throw new ArgumentNullException(nameof(authServicio));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -39,7 +40,7 @@ namespace AnhApi.Controladores
                     return BadRequest(ModelState);
                 }
 
-                var response = await _authServicio.AutenticarUsuario(request);
+                var response = await _servicioAuth.AutenticarUsuario(request);
 
                 if (response == null)
                 {

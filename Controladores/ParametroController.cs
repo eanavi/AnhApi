@@ -15,12 +15,12 @@ namespace AnhApi.Api.Controladores
     // [Authorize] // Descomenta si este controlador requiere autenticación
     public class ParametroController : ControllerBase
     {
-        private readonly ParametroServicio _parametroServicio;
+        private readonly IServicioParametro _parametroServicio;
         private readonly IMapper _mapper;
         private readonly ILogger<ParametroController> _logger;
 
         public ParametroController(
-            ParametroServicio parametroServicio,
+            IServicioParametro parametroServicio,
             IMapper mapper,
             ILogger<ParametroController> logger)
         {
@@ -73,11 +73,11 @@ namespace AnhApi.Api.Controladores
         }
 
 
-        [HttpGet("grupo")]
+        [HttpGet("grupo/{grupo:alpha}")]
         [ProducesResponseType(typeof(IEnumerable<ParametroCmb>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<IEnumerable<ParametroCmb>>> ObtenerGrupo([FromQuery] string grupo) 
+        public async Task<ActionResult<IEnumerable<ParametroCmb>>> ObtenerGrupo([FromRoute] string grupo) 
         {
             try
             {
@@ -104,10 +104,10 @@ namespace AnhApi.Api.Controladores
         /// <param name="id">El ID del parámetro.</param>
         /// <returns>Un objeto ParametroEsq si se encuentra, o NotFound si no.</returns>
         [HttpGet("{id}")] // GET /api/Parametro/{id}
-        [ProducesResponseType(typeof(PaisEsq), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(EsqPais), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<PaisEsq>> ObtenerParametroPorId(int id)
+        public async Task<ActionResult<EsqPais>> ObtenerParametroPorId([FromRoute] int id)
         {
             try
             {
@@ -117,7 +117,7 @@ namespace AnhApi.Api.Controladores
                     _logger.LogWarning($"Parámetro con ID {id} no encontrado.");
                     return NotFound($"Parámetro con ID {id} no encontrado.");
                 }
-                var parametroEsq = _mapper.Map<PaisEsq>(parametro);
+                var parametroEsq = _mapper.Map<EsqPais>(parametro);
                 return Ok(parametroEsq);
             }
             catch (Exception ex)
@@ -133,10 +133,10 @@ namespace AnhApi.Api.Controladores
         /// <param name="parametroCreacionDto">Datos del parámetro a crear.</param>
         /// <returns>El parámetro creado con su ID y campos de auditoría.</returns>
         [HttpPost] // POST /api/Parametro
-        [ProducesResponseType(typeof(PaisEsq), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(EsqPais), StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<PaisEsq>> CrearParametro([FromBody] PaisCreacion parametroCreacionDto)
+        public async Task<ActionResult<EsqPais>> CrearParametro([FromBody] PaisCreacion parametroCreacionDto)
         {
             try
             {
@@ -155,7 +155,7 @@ namespace AnhApi.Api.Controladores
                 string ip = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "127.0.0.1"; // Reemplaza con lógica real de obtención de IP
 
                 var nuevoParametro = await _parametroServicio.CrearAsync(parametroModel);
-                var parametroEsq = _mapper.Map<PaisEsq>(nuevoParametro);
+                var parametroEsq = _mapper.Map<EsqPais>(nuevoParametro);
 
                 return CreatedAtAction(
                     nameof(ObtenerParametroPorId),
@@ -180,7 +180,7 @@ namespace AnhApi.Api.Controladores
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> ActualizarParametro(int id, [FromBody] PaisEsq parametroEsqDto)
+        public async Task<ActionResult> ActualizarParametro([FromRoute] int id, [FromBody] EsqPais parametroEsqDto)
         {
             try
             {
@@ -229,7 +229,7 @@ namespace AnhApi.Api.Controladores
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> EliminarParametro(int id)
+        public async Task<ActionResult> EliminarParametro([FromRoute] int id)
         {
             try
             {
@@ -264,7 +264,7 @@ namespace AnhApi.Api.Controladores
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> EliminarParametroFisico(int id)
+        public async Task<ActionResult> EliminarParametroFisico([FromRoute] int id)
         {
             try
             {

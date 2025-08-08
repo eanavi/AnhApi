@@ -11,11 +11,11 @@ namespace AnhApi.Controladores
     [Route("api/[controller]")]
     public class PaisController : ControllerBase
     {
-        private readonly PaisServicio _servPais;
+        private readonly IServicioPais _servPais;
         private readonly IMapper _mapper;
         private readonly ILogger<PaisController> _logger;
 
-        public PaisController(PaisServicio servPais, IMapper mapper, ILogger<PaisController> logger)
+        public PaisController(IServicioPais servPais, IMapper mapper, ILogger<PaisController> logger)
         {
             _servPais = servPais ?? throw new ArgumentNullException(nameof(servPais));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
@@ -66,12 +66,12 @@ namespace AnhApi.Controladores
         /// <param name="criterio">Puede ser el nombre de un pais, codigo 2 letras, codigo 3 letras o cod numerico</param>
         /// <param name="paginacion">PaginaNumero=...&TamanoPagina..</param>
         /// <returns></returns>
-        [HttpGet("buscar")]
+        [HttpGet("buscar/{criterio:alpha}")]
         [ProducesResponseType(typeof(IEnumerable<PaisListado>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<IEnumerable<PaisListado>>> Buscar([FromQuery] string? criterio)
+        public async Task<ActionResult<IEnumerable<PaisListado>>> Buscar([FromRoute] string? criterio)
         {
             try
             {
@@ -91,10 +91,10 @@ namespace AnhApi.Controladores
         }
 
         [HttpGet("{id:int}")]
-        [ProducesResponseType(typeof(PaisEsq), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(EsqPais), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<PaisEsq>> ObtenerPorIdAsync(int id)
+        public async Task<ActionResult<EsqPais>> ObtenerPorIdAsync(int id)
         {
             try
             {
@@ -103,7 +103,7 @@ namespace AnhApi.Controladores
                 {
                     return NotFound($"No se encontró un país con el ID {id}.");
                 }
-                var paisEsq = _mapper.Map<PaisEsq>(pais);
+                var paisEsq = _mapper.Map<EsqPais>(pais);
                 return Ok(paisEsq);
             }
             catch (Exception ex)
@@ -113,12 +113,35 @@ namespace AnhApi.Controladores
             }
         }
 
+        [HttpGet("departamentos/{id:int}")]
+        [ProducesResponseType(typeof(PaisConDepartamentosEsq), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<PaisConDepartamentosEsq>> ObtenerPaisConDepartamentos([FromRoute] int id)
+        {
+            try
+            {
+                var paisConD = await _servPais.ObtenerPaisConDepartamentosAsync(id);
+                if(paisConD == null)
+                {
+                    return NotFound($"No se encontro un pais con el Id {id}");
+                }
+                var paisConDEsq = _mapper.Map<PaisConDepartamentosEsq>(paisConD);
+                return Ok(paisConDEsq);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error al obtener el pais con id {id}");
+                return StatusCode(StatusCodes.Status500InternalServerError, "Error Interno");
+            }
+        }
+
 
         [HttpPost]
-        [ProducesResponseType(typeof(PaisEsq),StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(EsqPais),StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<PaisEsq>> CrearPais([FromBody] PaisCreacion paisCreacion)
+        public async Task<ActionResult<EsqPais>> CrearPais([FromBody] PaisCreacion paisCreacion)
         {
             try
             {
@@ -132,7 +155,7 @@ namespace AnhApi.Controladores
 
                 var nPais = await _servPais.CrearAsync(pais);
 
-                var paisEsq = _mapper.Map<PaisEsq>(nPais);
+                var paisEsq = _mapper.Map<EsqPais>(nPais);
                 return CreatedAtAction(nameof(ObtenerPorIdAsync), new { id = paisEsq.IdPais }, paisEsq);
             }
             catch (Exception ex)
@@ -148,7 +171,7 @@ namespace AnhApi.Controladores
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> ActualizarPais(int id, [FromBody] PaisEsq pais)
+        public async Task<ActionResult> ActualizarPais([FromRoute] int id, [FromBody] EsqPais pais)
         {
             try
             {
@@ -165,14 +188,12 @@ namespace AnhApi.Controladores
                     return NotFound($"Parametro con ID {id} no encontrado");
                 }
                 return NoContent();
-
-
-            } catch (Exception ex)
+            } 
+            catch (Exception ex)
             {
                 _logger.LogError(ex, $"Error al actualizar el parametro con ID {id}");
                 return StatusCode(500, $"Error interno del servidor al actualizar el parametro con ID {id}");
             }
         }
-
     }
 }
