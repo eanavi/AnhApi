@@ -87,7 +87,7 @@ namespace AnhApi.Controladores
         /// carnet de identidad que son numeros
         /// fecha de nacimiento en formato dd-mm-yyyy para no confundir al enrutador</param>
         /// <returns>lista de Personas</returns>
-        [HttpGet("buscar/{criterio:alpha}")] // Ruta: GET api/personas/buscar/criterio?PaginaNumero=...&TamanoPagina=...
+        [HttpGet("buscar/{criterio}")] // Ruta: GET api/personas/buscar/criterio?PaginaNumero=...&TamanoPagina=...
         [ProducesResponseType(typeof(PaginacionResultado<PersonaListado>), StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -105,7 +105,7 @@ namespace AnhApi.Controladores
 
                 var resultadoPaginado = await _personaServ.BuscarPaginado(criterio ?? "", parametrosPaginacion);
 
-                return Ok(resultadoPaginado);
+              return Ok(resultadoPaginado);
             }
             catch (Exception ex)
             {

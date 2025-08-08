@@ -2,6 +2,7 @@
 using AnhApi.Modelos;
 using AnhApi.Esquemas;
 using System.Text.Json;
+using Microsoft.Extensions.Options;
 
 namespace AnhApi.Mapeos
 {
@@ -19,9 +20,73 @@ namespace AnhApi.Mapeos
                 .ForMember(dest => dest.numero_identificacion, opt => opt.MapFrom(src => src.NumeroIdentificacion))
                 .ForMember(dest => dest.complemento, opt => opt.MapFrom(src => src.Complemento))
                 .ForMember(dest => dest.genero, opt => opt.MapFrom(src => src.Genero))
-                .ForMember(dest => dest.direccion, opt => opt.MapFrom(src => src.Direccion))
-                .ForMember(dest => dest.telefono, opt => opt.MapFrom(src => src.Telefono))
-                .ForMember(dest => dest.correo, opt => opt.MapFrom(src => src.Correo));
+                .ForMember(dest => dest.direccion, opt => opt.Ignore()) //sera mapeado de forma particular
+                .ForMember(dest => dest.telefono, opt => opt.Ignore()) //sera mapeado de forma particular
+                .ForMember(dest => dest.correo, opt => opt.Ignore()) //sera mapeado de forma particular
+                                                                     //Mapeado del campo Direccion, Telefono
+                .AfterMap((src, dest) =>
+                {
+                    //Direccion
+                    if (src.Direccion != null)
+                    {
+                        try
+                        {
+                            var json = JsonSerializer.Serialize(src.Direccion);
+                            dest.direccion = JsonDocument.Parse(json);
+                        }
+                        catch (JsonException ex)
+                        {
+                            dest.direccion = null; // Manejo de error si la serialización falla
+                            // Manejo de error si la serialización falla
+                            throw new ApplicationException("Error al serializar la dirección.", ex);
+                        }
+                    }
+                    else
+                    {
+                        dest.direccion = null; // Si no hay dirección, se establece como null
+                    }
+
+                    //Telefono
+                    if (src.Telefono != null)
+                    {
+                        try
+                        {
+                            var json = JsonSerializer.Serialize(src.Telefono);
+                            dest.telefono = JsonDocument.Parse(json);
+                        }
+                        catch (JsonException ex)
+                        {
+                            dest.telefono = null; // Manejo de error si la serialización falla
+                            throw new ApplicationException("Error al serializar el teléfono.", ex);
+                        }
+                    }
+                    else
+                    {
+                        dest.telefono = null; // Si no hay teléfono, se establece como null
+                    }
+
+                    //Correo
+                    if (src.Correo != null)
+                    {
+                        try
+                        {
+                            var json = JsonSerializer.Serialize(src.Correo);
+                            dest.correo = JsonDocument.Parse(json);
+                        }
+                        catch (JsonException ex)
+                        {
+                            dest.correo = null; // Manejo de error si la serialización falla
+                            throw new ApplicationException("Error al serializar el correo.", ex);
+                        }
+                    }
+                    else
+                    {
+                        dest.correo = null; // Si no hay correo, se establece como null
+                    }
+
+                    // Aquí puedes agregar lógica adicional si es necesario después del mapeo
+                    // Por ejemplo, si necesitas establecer algún campo específico o validar algo
+                });
             // Los campos de auditoría (aud_estado, etc.) no están en PersonaCreacion,
             // se asume que los asignas en el servicio (ej. 'aud_estado = 0', 'aud_usuario = "sistema"')
             // Mapeo para actualizar desde el Esquema (EsqPersona) al Modelo (Modelos.Persona)
@@ -72,13 +137,79 @@ namespace AnhApi.Mapeos
                 .ForMember(dest => dest.numero_identificacion, opt => opt.MapFrom(src => src.NumeroIdentificacion))
                 .ForMember(dest => dest.complemento, opt => opt.MapFrom(src => src.Complemento))
                 .ForMember(dest => dest.genero, opt => opt.MapFrom(src => src.Genero))
-                .ForMember(dest => dest.direccion, opt => opt.MapFrom(src => src.Direccion))
-                .ForMember(dest => dest.telefono, opt => opt.MapFrom(src => src.Telefono))
-                .ForMember(dest => dest.correo, opt => opt.MapFrom(src => src.Correo))
+
+                .ForMember(dest => dest.direccion, opt => opt.Ignore()) //sera mapeado de forma particular
+                .ForMember(dest => dest.telefono, opt => opt.Ignore()) //sera mapeado de forma particular
+                .ForMember(dest => dest.correo, opt => opt.Ignore()) //sera mapeado de forma particular
+                
                 .ForMember(dest => dest.aud_estado, opt => opt.MapFrom(src => src.AudEstado))
                 .ForMember(dest => dest.aud_usuario, opt => opt.MapFrom(src => src.AudUsuario))
                 .ForMember(dest => dest.aud_fecha, opt => opt.MapFrom(src => src.AudFecha))
-                .ForMember(dest => dest.aud_ip, opt => opt.MapFrom(src => src.AudIp));
+                .ForMember(dest => dest.aud_ip, opt => opt.MapFrom(src => src.AudIp))
+
+                //Mapeado del campo Direccion, Telefono
+                .AfterMap((src, dest) => 
+                {
+                    //Direccion
+                    if (src.Direccion != null)
+                    {
+                        try
+                        {
+                            var json = JsonSerializer.Serialize(src.Direccion);
+                            dest.direccion = JsonDocument.Parse(json);
+                        }
+                        catch (JsonException ex)
+                        {
+                            dest.direccion = null; // Manejo de error si la serialización falla
+                            // Manejo de error si la serialización falla
+                            throw new ApplicationException("Error al serializar la dirección.", ex);
+                        }
+                    }
+                    else
+                    {
+                        dest.direccion = null; // Si no hay dirección, se establece como null
+                    }
+
+                    //Telefono
+                    if (src.Telefono != null)
+                    {
+                        try
+                        {
+                            var json = JsonSerializer.Serialize(src.Telefono);
+                            dest.telefono = JsonDocument.Parse(json);
+                        }
+                        catch (JsonException ex)
+                        {
+                            dest.telefono = null; // Manejo de error si la serialización falla
+                            throw new ApplicationException("Error al serializar el teléfono.", ex);
+                        }
+                    } else
+                    {
+                        dest.telefono = null; // Si no hay teléfono, se establece como null
+                    }
+
+                    //Correo
+                    if( src.Correo != null)
+                    {
+                        try
+                        {
+                            var json = JsonSerializer.Serialize(src.Correo);
+                            dest.correo = JsonDocument.Parse(json);
+                        }
+                        catch (JsonException ex)
+                        {
+                            dest.correo = null; // Manejo de error si la serialización falla
+                            throw new ApplicationException("Error al serializar el correo.", ex);
+                        }
+                    } else
+                    {
+                        dest.correo = null; // Si no hay correo, se establece como null
+                    }
+
+                    // Aquí puedes agregar lógica adicional si es necesario después del mapeo
+                    // Por ejemplo, si necesitas establecer algún campo específico o validar algo
+                })
+                ;
         }
     }
 }

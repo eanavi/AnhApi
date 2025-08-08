@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System.Text.Json;
 using AnhApi.Modelos;
 using AnhApi.Modelos.prm;
 
@@ -31,6 +32,32 @@ namespace AnhApi.Datos
             // Registrar todas las configuraciones en el ensamblado donde está AppDbContext
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(ContextoAppBD).Assembly);
 
+            /*
+            modelBuilder.Entity<Persona>(builder =>
+            {
+                builder.Property(p => p.direccion)
+                .HasColumnType("jsonb")
+                .HasConversion(
+                  v => v != null ? JsonSerializer.Serialize(v, new JsonSerializerOptions()) : null,
+                  v => !string.IsNullOrEmpty(v) ? JsonDocument.Parse(v, default(JsonDocumentOptions)) : null
+                );
+
+                builder.Property(p => p.telefono)
+                .HasColumnType("jsonb")
+                .HasConversion(
+                  v => v != null ? JsonSerializer.Serialize(v, new JsonSerializerOptions()) : null,
+                  v => !string.IsNullOrEmpty(v) ? JsonDocument.Parse(v, default(JsonDocumentOptions)) : null
+                );
+
+                builder.Property(p => p.correo)
+                .HasColumnType("jsonb")
+                .HasConversion(
+                   v => v != null ? JsonSerializer.Serialize(v, new JsonSerializerOptions()) : null,
+                   v => !string.IsNullOrEmpty(v) ? JsonDocument.Parse(v, default(JsonDocumentOptions)) : null
+                );
+            });
+
+            */
         }
 
     }

@@ -1,6 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using System.Text.Json;
 using AnhApi.Modelos;
+
 
 
 namespace AnhApi.Datos.Configuraciones
@@ -56,15 +58,26 @@ namespace AnhApi.Datos.Configuraciones
 
             entity.Property(e => e.direccion)
                   .HasColumnName("direccion")
-                  .HasColumnType("jsonb");
+                  .HasColumnType("jsonb")
+                  .HasConversion(
+                    v => v != null ? JsonSerializer.Serialize(v, new JsonSerializerOptions()) : null,
+                    v => !string.IsNullOrEmpty(v) ? JsonDocument.Parse(v, default(JsonDocumentOptions)) : null);
 
             entity.Property(e => e.telefono)
                   .HasColumnName("telefono")
-                  .HasColumnType("jsonb");
+                  .HasColumnType("jsonb")
+                  .HasConversion(
+                    v => v != null ? JsonSerializer.Serialize(v, new JsonSerializerOptions()) : null,
+                    v => !string.IsNullOrEmpty(v) ? JsonDocument.Parse(v, default(JsonDocumentOptions)) : null
+                  );
 
             entity.Property(e => e.correo)
                   .HasColumnName("correo")
-                  .HasColumnType("jsonb");
+                  .HasColumnType("jsonb")
+                  .HasConversion(
+                     v => v != null ? JsonSerializer.Serialize(v, new JsonSerializerOptions()) : null,
+                     v => !string.IsNullOrEmpty(v) ? JsonDocument.Parse(v, default(JsonDocumentOptions)) : null
+                );
 
             entity.Property(e => e.aud_estado)
                   .HasColumnName("aud_estado")
