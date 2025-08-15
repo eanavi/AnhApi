@@ -73,7 +73,7 @@ namespace AnhApi.Api.Controladores
         }
 
 
-        [HttpGet("grupo/{grupo:alpha}")]
+        [HttpGet("grupo/{grupo}")]
         [ProducesResponseType(typeof(IEnumerable<ParametroCmb>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]

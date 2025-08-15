@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.AspNetCore.Authorization;
 using AnhApi.Esquemas;
-using AnhApi.Modelos.prm;
 using AnhApi.Modelos;
 using AutoMapper;
 using AnhApi.Interfaces;

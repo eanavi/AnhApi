@@ -1,7 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Mvc;
 using AnhApi.Esquemas;
 using Microsoft.AspNetCore.Authorization;
 using AnhApi.Interfaces;

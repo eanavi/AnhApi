@@ -9,5 +9,7 @@ namespace AnhApi.Modelos.prm
         public string descripcion { get; set; } = null!; // varchar(120) NOT NULL
         public string? sigla { get; set; } // varchar(10) NULL
         public string grupo { get; set; } = null!; // varchar(60) NOT NULL
+
+        public ICollection<RepresentanteEntidad> RepresentantesEntidadParametro { get; set; } = new List<RepresentanteEntidad>(); // Relación con RepresentanteEntidadParametro
     }
 }

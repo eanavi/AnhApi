@@ -105,7 +105,7 @@ namespace AnhApi.Controladores
 
                 var resultadoPaginado = await _personaServ.BuscarPaginado(criterio ?? "", parametrosPaginacion);
 
-              return Ok(resultadoPaginado);
+                return Ok(resultadoPaginado);
             }
             catch (Exception ex)
             {

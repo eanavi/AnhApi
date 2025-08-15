@@ -2,6 +2,12 @@
 using System.Text.Json;
 using AnhApi.Modelos;
 using AnhApi.Modelos.prm;
+using AutoMapper.Execution;
+using System.Drawing;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using NpgsqlTypes;
+using NetTopologySuite.Geometries;
+using AnhApi.Esquemas;
 
 
 namespace AnhApi.Datos
@@ -22,7 +28,13 @@ namespace AnhApi.Datos
         public DbSet<Jerarquia> JerarquiasMunicipio { get; set; }
         public DbSet<DocumentoEntidad> DocumentosEntidad { get; set; }
 
+        public DbSet<Entidad> Entidades { get; set; }
+
         public DbSet<Localidad> Localidades { get; set; }
+
+        public DbSet<EntidadListado> EntidadesListado { get; set; }
+        public DbSet<RepresentanteEntidad> RepresentantesEntidad { get; set; }
+
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -32,32 +44,10 @@ namespace AnhApi.Datos
             // Registrar todas las configuraciones en el ensamblado donde está AppDbContext
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(ContextoAppBD).Assembly);
 
-            /*
-            modelBuilder.Entity<Persona>(builder =>
-            {
-                builder.Property(p => p.direccion)
-                .HasColumnType("jsonb")
-                .HasConversion(
-                  v => v != null ? JsonSerializer.Serialize(v, new JsonSerializerOptions()) : null,
-                  v => !string.IsNullOrEmpty(v) ? JsonDocument.Parse(v, default(JsonDocumentOptions)) : null
-                );
+            modelBuilder.Entity<EntidadListado>().HasNoKey();
 
-                builder.Property(p => p.telefono)
-                .HasColumnType("jsonb")
-                .HasConversion(
-                  v => v != null ? JsonSerializer.Serialize(v, new JsonSerializerOptions()) : null,
-                  v => !string.IsNullOrEmpty(v) ? JsonDocument.Parse(v, default(JsonDocumentOptions)) : null
-                );
 
-                builder.Property(p => p.correo)
-                .HasColumnType("jsonb")
-                .HasConversion(
-                   v => v != null ? JsonSerializer.Serialize(v, new JsonSerializerOptions()) : null,
-                   v => !string.IsNullOrEmpty(v) ? JsonDocument.Parse(v, default(JsonDocumentOptions)) : null
-                );
-            });
 
-            */
         }
 
     }

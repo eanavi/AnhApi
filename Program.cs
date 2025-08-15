@@ -1,26 +1,20 @@
 using AnhApi.Esquemas;
 using AnhApi.Mapeos; // Ajustado para MappingProfile
-using AnhApi.Modelos;
 using AnhApi.Nucleo;
 using AnhApi.Servicios;
 using AnhApi.Interfaces;
-using AnhApi.Controladores;
-using AutoMapper; // Necesario para AutoMapper
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.OpenApi.Models;
 using Serilog; // Necesario para usar Log.Information()
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Microsoft.Extensions.Logging.Abstractions;
-using System.Security.Cryptography;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using System.Reflection;
 using Microsoft.AspNetCore.RateLimiting;
-using System.Diagnostics; // <-- Añadido para Assembly busqueda de servicios en los programas disponibles
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
+using Npgsql.EntityFrameworkCore.PostgreSQL.NetTopologySuite;
 
 DotNetEnv.Env.Load();
 var entorno = Environment.GetEnvironmentVariable("ENTORNO_ASPNETCORE");
@@ -28,6 +22,9 @@ if (!string.IsNullOrWhiteSpace(entorno))
 {
     Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", entorno);
 }
+
+//var httpPort = Environment.GetEnvironmentVariable("ASPNETCORE_HTTP_PORT");
+//var httpsPort = Environment.GetEnvironmentVariable("ASPNETCORE_HTTPS_PORT");
 
 var configuracionLogger = new LoggerConfiguration()
     .MinimumLevel.Debug() // Asegura que los mensajes Debug/Information sean capturados
@@ -39,6 +36,30 @@ var configuracionLogger = new LoggerConfiguration()
 
 // Opciones del Servidor
 var builder = WebApplication.CreateBuilder(args);
+
+/*cors
+//Configuracion del puerto http de acuerdo a la variable de .env
+if(!string.IsNullOrEmpty(httpPort) && int.TryParse(httpPort, out var httpPortNumber))
+{
+    builder.WebHost.ConfigureKestrel(serverOptions =>
+    {
+        serverOptions.ListenAnyIP(httpPortNumber);
+    });
+}
+
+//Configuracion del puerto https de acuerdo a la variable de .env
+if(!string.IsNullOrEmpty(httpsPort) && int.TryParse(httpsPort, out var httpsPortNumber))
+{
+    builder.WebHost.ConfigureKestrel(serverOptions =>
+    {
+        serverOptions.ListenAnyIP(httpsPortNumber, listenOptions =>
+        {
+            //Configuracion certificado
+            //listenOptions.useHttps();
+        });
+    });
+}
+*/
 
 //Incluir la configuracion de los archivos de parametros de la aplicacion
 builder.Configuration
@@ -118,7 +139,7 @@ builder.Services.AddAuthentication(o =>
 builder.Services.AddDbContext<AnhApi.Datos.ContextoAppBD>((serviceProvider, options) =>
 {
     var bdPostgres = serviceProvider.GetRequiredService<BdPostgres>();
-    options.UseNpgsql(bdPostgres.GetConnectionString());
+    options.UseNpgsql(bdPostgres.GetConnectionString(), x => x.UseNetTopologySuite());
 });
 
 
@@ -138,6 +159,48 @@ builder.Services.AddRateLimiter(options => {
 
 // Configurar AutoMapper
 builder.Services.AddAutoMapper(typeof(Program).Assembly);
+
+var env = builder.Environment;
+
+/*
+
+//Configuracion de CORSs
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("PoliticaCors", policy =>
+    {
+        if (env.IsDevelopment())
+        {
+
+            policy
+            .AllowAnyOrigin()
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+            //Dominios permitidos
+        }
+        else
+        {
+            policy.WithOrigins(
+                "https://localhost:5001", 
+                "http://localhost:5000", 
+                "http://127.0.0.1:5000", 
+                "http://0.0.0.1:5000", 
+                "http://anh.gov.bo"
+            )
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+
+
+        }
+
+        // Configuración de CORS para producción
+
+
+
+
+    });
+});*/
+
 
 // --- Registro de servicios por convención los servicios a registrar empieza con I[NombreClaseServicio] ---
 // Registrar el servicio genérico IGenericoServicio<,> -> GenericoServicio<,>
@@ -246,8 +309,11 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+
 app.UseRateLimiter();
 app.UseHttpsRedirection();
+//app.UseCors("PoliticaCors");
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();

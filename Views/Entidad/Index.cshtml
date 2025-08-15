@@ -1,0 +1,149 @@
+﻿@model IEnumerable<AnhApi.Modelos.Entidad>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.id_tipo_entidad)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.id_tipo_sociedad)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.id_ambito_operacion)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.id_localidad)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.id_municipio)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.id_estado_operacion)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.id_estado_empadronamiento)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.denominacion)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.sigla)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.identificacion)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.tipo_identificacion)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.fecha_registro)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.direccion)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.telefono)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.correo)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.EntidadPadre)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.aud_estado)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.aud_usuario)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.aud_ip)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.aud_fecha)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.id_tipo_entidad)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.id_tipo_sociedad)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.id_ambito_operacion)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.id_localidad)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.id_municipio)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.id_estado_operacion)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.id_estado_empadronamiento)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.denominacion)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.sigla)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.identificacion)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.tipo_identificacion)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.fecha_registro)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.direccion)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.telefono)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.correo)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.EntidadPadre.aud_ip)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.aud_estado)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.aud_usuario)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.aud_ip)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.aud_fecha)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.id_entidad">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.id_entidad">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.id_entidad">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
