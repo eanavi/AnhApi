@@ -24,6 +24,10 @@ namespace AnhApi.Modelos
         // Comentario: "Nombre del archivo donde se guardara el documento descrito"
         public string? nombre_archivo { get; set; }
 
+        // Campo: fecha_doc (date NOT NULL en DB)
+        // Comentario: "Fecha del documento"
+        public DateTime fecha_doc { get; set; } = DateTime.UtcNow; // Asignar fecha actual por defecto
+
         // Campo: url_archivo (varchar(200) NULL en DB)
         // Comentario: "Ubicacion del archivo donde esta almacenado el documento"
         public string? url_archivo { get; set; }

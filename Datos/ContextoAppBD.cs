@@ -27,11 +27,8 @@ namespace AnhApi.Datos
         public DbSet<Municipio> Municipios { get; set; }
         public DbSet<Jerarquia> JerarquiasMunicipio { get; set; }
         public DbSet<DocumentoEntidad> DocumentosEntidad { get; set; }
-
         public DbSet<Entidad> Entidades { get; set; }
-
         public DbSet<Localidad> Localidades { get; set; }
-
         public DbSet<EntidadListado> EntidadesListado { get; set; }
         public DbSet<RepresentanteEntidad> RepresentantesEntidad { get; set; }
 
@@ -45,8 +42,6 @@ namespace AnhApi.Datos
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(ContextoAppBD).Assembly);
 
             modelBuilder.Entity<EntidadListado>().HasNoKey();
-
-
 
         }
 

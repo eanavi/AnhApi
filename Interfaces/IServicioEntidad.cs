@@ -8,5 +8,6 @@ namespace AnhApi.Interfaces
         Task<PaginacionResultado<EntidadListado>> listarPaginado(PaginacionParametros paginacion);
         Task<PaginacionResultado<EntidadListado>> BuscarPaginado(string criterio, PaginacionParametros paginacion);
         Task<EntidadListadoRepresentante> EntidadConRepresentante(Guid id);
+        Task<EntidadListadoDocumentos> EntidadDocumentos(Guid id);
     }
 }

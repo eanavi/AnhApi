@@ -40,5 +40,7 @@ namespace AnhApi.Modelos
         public ICollection<Entidad>? EntidadesHijas { get; set; }
 
         public ICollection<RepresentanteEntidad> Representantes { get; set; } = new List<RepresentanteEntidad>();
+
+        public ICollection<DocumentoEntidad> Documentos { get; set; } = new List<DocumentoEntidad>();
     }
 }

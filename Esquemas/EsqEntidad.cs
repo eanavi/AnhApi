@@ -91,6 +91,12 @@ namespace AnhApi.Esquemas
     }
 
 
+    public class EntidadListadoDocumentos: EntidadListado
+    {
+        public ICollection<DocEntidadDespliegue> Documentos { get; set; } = new List<DocEntidadDespliegue>();
+    }
+
+
     #region EsqEntidad
     /// <summary>
     /// Esquema completo de una entidad, usado para respuestas detalladas y actualizaciones.

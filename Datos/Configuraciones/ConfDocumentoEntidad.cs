@@ -32,6 +32,11 @@ namespace AnhApi.Datos.Configuraciones
                   .HasColumnName("cite")
                   .HasMaxLength(60); // varchar(60) NULL
 
+            entity.Property(e => e.fecha_doc)
+                .HasColumnName("fecha_doc")
+                .IsRequired()
+                .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
             entity.Property(e => e.nombre_archivo)
                   .HasColumnName("nombre_archivo")
                   .HasMaxLength(200); // varchar(200) NULL

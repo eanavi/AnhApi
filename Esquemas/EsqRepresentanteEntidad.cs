@@ -1,6 +1,5 @@
 ﻿namespace AnhApi.Esquemas
 {
-
     public class RepresentanteEntidadCreacion
     {
         public Guid IdPersona { get; set; } // Identificador de la persona que es representante
@@ -10,11 +9,8 @@
     public class EsqRepresentanteEntidad: RepresentanteEntidadCreacion
     {
         public int IdRepresentanteEntidad { get; set; } // Identificador único del representante de entidad
-        public string TipoRepresentante { get; set; }
-
+        public string? TipoRepresentante { get; set; }
         public Guid IdPersona { get; set; }
         public string NombreRepresentante { get; set; }
-
-
     }
 }

@@ -152,7 +152,7 @@ namespace AnhApi.Controladores
         {
             try
             {
-                if(id != entidadDto.IdEntidad)
+                if (id != entidadDto.IdEntidad)
                 {
                     return BadRequest("El Id de la ruta no coincide con el id del cuerpo de la solicitud");
                 }
@@ -177,7 +177,7 @@ namespace AnhApi.Controladores
 
                 return NoContent();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _logger.LogError(ex, $"Error al actualizar la persona con ID {id}.");
                 return StatusCode(500, $"Error interno del servidor al actualizar la Entidad con ID {id}");
@@ -208,5 +208,26 @@ namespace AnhApi.Controladores
             }
         }
 
+        [HttpGet("documentos/{id:guid}")]
+        [ProducesResponseType(typeof(EntidadListadoDocumentos), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<EntidadListadoDocumentos>> ObtenerEntidadConDocumentosAsync([FromRoute] Guid id)
+        {
+            try
+            {
+                var entConDoc = await _servicioEntidad.EntidadDocumentos(id);
+                if (entConDoc == null)
+                {
+                    return NotFound($"No se encontro la entidad con el id{id}");
+                }
+                return Ok(entConDoc);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error al obtener la entidad con el id {id}");
+                return StatusCode(StatusCodes.Status500InternalServerError, "error Interno");
+            }
+        }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.RateLimiting;
+using Microsoft.AspNetCore.Authorization;
 using AnhApi.Esquemas;
 using AnhApi.Interfaces;
 using AutoMapper;
@@ -6,6 +7,10 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace AnhApi.Controladores
 {
+
+    [ApiController]
+    [Route("api/[controller]")]
+    [Authorize]
     public class DocumentoEntidadController : ControllerBase
     {
         private readonly IServicioDocumentoEntidad _servicioDocumentoEntidad;
@@ -25,7 +30,6 @@ namespace AnhApi.Controladores
 
         [HttpGet]
         [ProducesResponseType(typeof(PaginacionResultado<EsqDocumentoEntidad>), StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [EnableRateLimiting("fijo")]
         [ProducesResponseType(StatusCodes.Status409Conflict)]//demasiadas peticiones
         [ProducesResponseType(StatusCodes.Status400BadRequest)]//Paginacion erronea
@@ -60,5 +64,34 @@ namespace AnhApi.Controladores
                 return StatusCode(StatusCodes.Status500InternalServerError, "Error interno del servidor");
             }
         }
+
+        [HttpGet("documentos/{id:guid}")]
+        [ProducesResponseType(typeof(DocEntidadDespliegue), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<DocEntidadDespliegue>> ObtenerDocumentos([FromRoute] Guid id)
+        {
+            try
+            {
+                if (id == Guid.Empty)
+                {
+                    return BadRequest("El ID de la entidad no puede estar vacío.");
+                }
+                var documentos = await _servicioDocumentoEntidad.ObtenerPorEntidadIdAsync(id);
+                if (documentos == null || !documentos.Any())
+                {
+                    return NotFound($"No se encontraron documentos para la entidad con ID {id}.");
+                }
+                return Ok(documentos);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error al obtener documentos para la entidad con ID {id}.");
+                return StatusCode(StatusCodes.Status500InternalServerError, "Error interno del servidor");
+            }
+        }
+
     }
 }

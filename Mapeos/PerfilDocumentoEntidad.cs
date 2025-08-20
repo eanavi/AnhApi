@@ -15,6 +15,7 @@ namespace AnhApi.Mapeos
                 .ForMember(dest => dest.id_entidad, opt => opt.MapFrom(src => src.IdEntidad))
                 .ForMember(dest => dest.tipo_doc_inscr, opt => opt.MapFrom(src => src.TipoDocInscr))
                 .ForMember(dest => dest.cite, opt => opt.MapFrom(src => src.Cite))
+                .ForMember(dest => dest.fecha_doc, opt => opt.MapFrom(src => src.FechaDoc))
                 .ForMember(dest => dest.nombre_archivo, opt => opt.MapFrom(src => src.NombreArchivo))
                 .ForMember(dest => dest.url_archivo, opt => opt.MapFrom(src => src.UrlArchivo))
                 .ForMember(dest => dest.observaciones, opt => opt.MapFrom(src => src.Observaciones))
@@ -30,6 +31,7 @@ namespace AnhApi.Mapeos
                 .ForMember(dest => dest.IdEntidad, opt => opt.MapFrom(src => src.id_entidad))
                 .ForMember(dest => dest.TipoDocInscr, opt => opt.MapFrom(src => src.tipo_doc_inscr))
                 .ForMember(dest => dest.Cite, opt => opt.MapFrom(src => src.cite))
+                .ForMember(dest => dest.FechaDoc, opt => opt.MapFrom(src => src.fecha_doc))
                 .ForMember(dest => dest.NombreArchivo, opt => opt.MapFrom(src => src.nombre_archivo))
                 .ForMember(dest => dest.UrlArchivo, opt => opt.MapFrom(src => src.url_archivo));
 
@@ -39,6 +41,7 @@ namespace AnhApi.Mapeos
                 .ForMember(dest => dest.IdEntidad, opt => opt.MapFrom(src => src.id_entidad))
                 .ForMember(dest => dest.TipoDocInscr, opt => opt.MapFrom(src => src.tipo_doc_inscr))
                 .ForMember(dest => dest.Cite, opt => opt.MapFrom(src => src.cite))
+                .ForMember(dest => dest.FechaDoc, opt => opt.MapFrom(src => src.fecha_doc))
                 .ForMember(dest => dest.NombreArchivo, opt => opt.MapFrom(src => src.nombre_archivo))
                 .ForMember(dest => dest.UrlArchivo, opt => opt.MapFrom(src => src.url_archivo))
                 .ForMember(dest => dest.Observaciones, opt => opt.MapFrom(src => src.observaciones))
@@ -54,6 +57,7 @@ namespace AnhApi.Mapeos
                 .ForMember(dest => dest.id_entidad, opt => opt.MapFrom(src => src.IdEntidad))
                 .ForMember(dest => dest.tipo_doc_inscr, opt => opt.MapFrom(src => src.TipoDocInscr))
                 .ForMember(dest => dest.cite, opt => opt.MapFrom(src => src.Cite))
+                .ForMember(dest => dest.fecha_doc, opt => opt.MapFrom(src => src.FechaDoc))
                 .ForMember(dest => dest.nombre_archivo, opt => opt.MapFrom(src => src.NombreArchivo))
                 .ForMember(dest => dest.url_archivo, opt => opt.MapFrom(src => src.UrlArchivo))
                 .ForMember(dest => dest.observaciones, opt => opt.MapFrom(src => src.Observaciones))
