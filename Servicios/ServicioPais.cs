@@ -6,6 +6,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace AnhApi.Servicios
 {
+    /// <summary>
+    /// Para ver si esto se escribe en el seguimiento de git
+    /// </summary>
     public class ServicioPais : ServicioGenerico<Pais, int>, IServicioPais
     {
         private readonly ContextoAppBD _contextoBd;

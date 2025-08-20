@@ -88,7 +88,7 @@ namespace AnhApi.Esquemas
         [Required(ErrorMessage = "El ID de la persona es requerido.")]
         public Guid IdPersona { get; set; }
 
-        // Campos de auditoría
+        // Campos de auditoría que son opcionales
         public int? AudEstado { get; set; }
 
         [Required(ErrorMessage = "El usuario de auditoría es requerido.")]
@@ -104,6 +104,5 @@ namespace AnhApi.Esquemas
     }
 
     #endregion PersonaEsq
-
 
 }
