@@ -9,44 +9,65 @@
 # Carpeta de configuraciones de usuario de la solución
 .vs/
 
+#--------------------------------
 # Directorios de artefactos de compilación y temporales
+#--------------------------------
 [Dd]ebug/
 [Rr]elease/
+[Bb]uild/
 [Aa]rm64/
 [Aa]rm/
 x64/
 x86/
-
-# Binarios de la aplicación
 [Bb]in/
 [Oo]bj/
 [Ww]wwroot/
 !.gitkeep
 
+#--------------------------------
+# Binarios y ejecutables
+#--------------------------------
+*.dll
+*.exe
+*.pdb
+*.mdb
+*.cache
+
+#--------------------------------
 # Paquetes NuGet
+#--------------------------------
 *.nupkg
+*.snupkg
 [Pp]ackages/
+project.lock.json
+project.fragment.lock.json
+artifacts/
+*.nuget.props
+*.nuget.targets
+*.deps.json
 
 # Cache de paquetes NuGet global
 # .nuget/packages/
 
 #--------------------------------
+# Archivos de pruebas y cobertura
+#--------------------------------
+TestResult*/
+*.trx
+*.coverage
+*.coveragexml
+
+#--------------------------------
 # Archivos de Visual Studio Code
 #--------------------------------
-# Directorio de configuraciones del espacio de trabajo
-# Nota: La mayoría de las veces es útil compartir settings.json,
-# pero otros archivos como launch.json son personales.
-# Puedes descomentar la línea de abajo si no quieres compartir NINGUNA configuración.
-# .vscode/
 .vscode/tasks.json
 .vscode/launch.json
 .vscode/settings.json
 
+#--------------------------------
 # Archivos de logs y crash dumps
+#--------------------------------
 *.log
-*.pdb
-*.dll
-*.exe
 
 #--------------------------------
 # Archivos del sistema operativo y misceláneos
@@ -57,13 +78,31 @@ x86/
 # Windows
 Thumbs.db
 
-# Configuración de Rider (JetBrains)
+#--------------------------------
+# Configuración de Rider / Resharper
+#--------------------------------
 .idea/
 *.DotSettings.user
 
+#--------------------------------
 # Certificados de desarrollo de ASP.NET
-# No es recomendable subir certificados a un repositorio público
+#--------------------------------
 *.pfx
 
-#archivos de entorno de variables
+#--------------------------------
+# Archivos de entorno de variables
+#--------------------------------
 .env
+
+#--------------------------------
+# Archivos de bases de datos locales
+#--------------------------------
+*.dbmdl
+*.bak
+*.ldf
+*.mdf
+
+#--------------------------------
+# Archivos generados automáticamente
+#--------------------------------
+Generated\ Files/
