@@ -29,7 +29,7 @@ namespace AnhApi.Servicios
         /// <summary>
         /// Busca personas utilizando un procedimiento almacenado en la base de datos PostgreSQL.
         /// </summary>
-        /// <param name="criterio">El texto a buscar en el procedimiento almacenado.</param>
+        /// <param name="criterio">El texto a buscar en el procedimiento almacenado, puede ser Paterno, Nombre Paterno, Fecha nacimiento, CI.</param>
         /// <returns>Una colección de Personas que coinciden con el criterio.</returns>
         public async Task<IEnumerable<Persona>> Buscar(string criterio)
         {

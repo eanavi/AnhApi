@@ -30,7 +30,7 @@ var configuracionLogger = new LoggerConfiguration()
     .MinimumLevel.Debug() // Asegura que los mensajes Debug/Information sean capturados
     .Enrich.FromLogContext()
     .Enrich.WithProperty("ApplicationName", "AnhApi")
-    .Enrich.WithProperty("MchineName", Environment.MachineName)
+    .Enrich.WithProperty("MachineName", Environment.MachineName)
     .Enrich.WithProperty("ProcessId", Environment.ProcessId)
     .Enrich.WithProperty("TreadId", Environment.CurrentManagedThreadId);
 
