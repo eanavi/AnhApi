@@ -150,8 +150,8 @@ builder.Services.AddRateLimiter(options => {
     options.AddFixedWindowLimiter("fijo", opt =>
     {
         opt.PermitLimit = 20; // Número máximo de solicitudes permitidas
-        //opt.Window = TimeSpan.FromSeconds(20); // Ventana de tiempo de 5 segundos para prueba
-        opt.Window = TimeSpan.FromMinutes(1); // Ventana de tiempo de 1 minuto
+        opt.Window = TimeSpan.FromSeconds(20); // Ventana de tiempo de 5 segundos para prueba
+        //opt.Window = TimeSpan.FromMinutes(1); // Ventana de tiempo de 1 minuto
     });
 });
 

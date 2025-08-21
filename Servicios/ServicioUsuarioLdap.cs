@@ -30,16 +30,13 @@ namespace AnhApi.Servicios
                 return false;
 
             var contenidoJson = await File.ReadAllTextAsync(_rutaArchivo);
-
             var opciones = new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true
             };
-
             var usuarios = JsonSerializer.Deserialize<List<UsuarioLdap>>(contenidoJson, opciones);
 
             return usuarios?.Any(u => u.usuariO_DOMINIO?.Equals(loginCompleto, StringComparison.OrdinalIgnoreCase) == true) ?? false;
         }
-
     }
 }
