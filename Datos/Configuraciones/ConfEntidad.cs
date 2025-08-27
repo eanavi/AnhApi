@@ -39,15 +39,6 @@ namespace AnhApi.Datos.Configuraciones
                   .HasColumnName("sigla")
                   .HasMaxLength(50);
 
-            entity.Property(e => e.identificacion)
-                  .HasColumnName("identificacion")
-                  .HasMaxLength(50)
-                  .IsRequired();
-
-            entity.Property(e => e.tipo_identificacion)
-                  .HasColumnName("tipo_identificacion")
-                  .IsRequired();
-
             entity.Property(e => e.fecha_registro)
                   .HasColumnName("fecha_registro")
                   .IsRequired();
@@ -74,6 +65,10 @@ namespace AnhApi.Datos.Configuraciones
                       v => v != null ? JsonSerializer.Serialize(v, new JsonSerializerOptions()) : null,
                       v => !string.IsNullOrEmpty(v) ? JsonDocument.Parse(v, default(JsonDocumentOptions)) : null);
 
+            entity.Property(e => e.posicion)
+                .HasColumnName("posicion")
+                .HasColumnType("geometry(Point, 4326)");
+
             // Configuración de los campos de auditoría
             entity.Property(e => e.aud_estado).HasColumnName("aud_estado");
             entity.Property(e => e.aud_usuario).HasColumnName("aud_usuario").HasMaxLength(30).IsRequired();
@@ -90,6 +85,11 @@ namespace AnhApi.Datos.Configuraciones
             entity.HasMany(e => e.Representantes)
                 .WithOne(r => r.Entidad)
                 .HasForeignKey(r => r.id_entidad);
+
+            entity.HasMany(e => e.Documentos)
+                .WithOne(d => d.Entidad)
+                .HasForeignKey(d => d.id_entidad);
+
         }
     }
 }

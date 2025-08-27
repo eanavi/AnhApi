@@ -20,6 +20,12 @@ namespace AnhApi.Servicios
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
+
+        /// <summary>
+        /// Buscar provincias
+        /// </summary>
+        /// <param name="criterio"></param>
+        /// <returns></returns>
         public async Task<IEnumerable<Provincia>> Buscar(string criterio)
         {
             try

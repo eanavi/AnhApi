@@ -11,39 +11,33 @@ namespace AnhApi.Esquemas
     /// </summary>
     public class EntidadCreacion
     {
+
+        public Guid? IdEntidadPadre { get; set; }
+
+        [Required(ErrorMessage = "El tipo de entidad es requerido.")]
+        public int IdTipoEntidad { get; set; }
+        [Required(ErrorMessage = "El tipo de sociedad es requerido.")]
+        public int IdTipoSociedad { get; set; }
+        [Required(ErrorMessage = "El ámbito de operación es requerido.")]
+        public int IdAmbitoOperacion { get; set; }
+        public int? IdLocalidad { get; set; }
+        public int? IdMunicipio { get; set; }
+        public int? IdEstadoOperacion { get; set; }
+        public int? IdEstadoEmpadronamiento { get; set; }
+
         [Required(ErrorMessage = "La denominación es requerida.")]
         [StringLength(250, ErrorMessage = "La denominación no puede exceder los 250 caracteres.")]
         public string Denominacion { get; set; } = null!;
 
         [StringLength(50, ErrorMessage = "La sigla no puede exceder los 50 caracteres.")]
         public string? Sigla { get; set; }
+        [Required(ErrorMessage = "La fecha de registro es requerida.")]
+        public DateTime FechaRegistro { get; set; } = DateTime.UtcNow; // Asignar fecha actual por defecto
 
-        [Required(ErrorMessage = "La identificación es requerida.")]
-        [StringLength(50, ErrorMessage = "La identificación no puede exceder los 50 caracteres.")]
-        public string Identificacion { get; set; } = null!;
-
-        [Required(ErrorMessage = "El tipo de identificación es requerido.")]
-        public int TipoIdentificacion { get; set; }
-
-        [Required(ErrorMessage = "El tipo de entidad es requerido.")]
-        public int IdTipoEntidad { get; set; }
-
-        [Required(ErrorMessage = "El tipo de sociedad es requerido.")]
-        public int IdTipoSociedad { get; set; }
-
-        [Required(ErrorMessage = "El ámbito de operación es requerido.")]
-        public int IdAmbitoOperacion { get; set; }
-
-        public Guid? IdEntidadPadre { get; set; }
-        public int? IdLocalidad { get; set; }
-        public int? IdMunicipio { get; set; }
-        public int? IdEstadoOperacion { get; set; }
-        public int? IdEstadoEmpadronamiento { get; set; }
-
-        // Los campos de auditoría no se incluyen en la creación.
         public object? Direccion { get; set; }
         public object? Telefono { get; set; }
         public object? Correo { get; set; }
+        public Point? Posicion { get; set; }
     }
     #endregion
 

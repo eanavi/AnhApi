@@ -37,6 +37,6 @@ namespace AnhApi.Modelos
 
         // Propiedad de navegación para la relación con Entidad
         // Un DocumentoEntidad pertenece a una Entidad
-        //public Entidad Entidad { get; set; } = null!; // Asumo que id_entidad es NOT NULL, por lo tanto la navegación es requerida
+        public Entidad Entidad { get; set; } = null!; // Asumo que id_entidad es NOT NULL, por lo tanto la navegación es requerida
     }
 }
