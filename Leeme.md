@@ -38,3 +38,43 @@ En línea: 3 Carácter: 5
 +     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     + CategoryInfo          : InvalidOperation: (System.Net.HttpWebRequest:HttpWebRequest) [Invoke-WebRequest], WebException
     + FullyQualifiedErrorId : WebCmdletWebResponseException,Microsoft.PowerShell.Commands.InvokeWebRequestCommand
+
+
+## Deploy en IIS
+
+### Ruta del proyecto
+$projectPath = "C:\inetpub\wwwroot\AnhApi"
+
+### Ruta de publicación (salida de dotnet publish)
+$publishPath = "$projectPath\publish"
+
+Write-Host "==== 1. Limpiando carpeta de publicación ===="
+if (Test-Path $publishPath) {
+    Remove-Item -Recurse -Force $publishPath
+}
+
+Write-Host "==== 2. Limpiando y compilando proyecto ===="
+cd $projectPath
+dotnet clean
+dotnet build -c Release
+
+Write-Host "==== 3. Publicando en modo self-contained ===="
+dotnet publish -c Release -r win-x64 --self-contained true -o $publishPath
+
+Write-Host "==== 4. Copiando archivos a la carpeta raíz de IIS ===="
+### Borra todo menos la carpeta .git (si estás clonando ahí)
+Get-ChildItem $projectPath -Exclude ".git","publish" | Remove-Item -Recurse -Force
+
+### Copia el contenido de publish a la carpeta del proyecto
+Copy-Item -Path "$publishPath\*" -Destination $projectPath -Recurse -Force
+
+Write-Host "==== 5. Creando carpeta de logs si no existe ===="
+$logsPath = "$projectPath\logs"
+if (-Not (Test-Path $logsPath)) {
+    New-Item -Path $logsPath -ItemType Directory | Out-Null
+}
+
+Write-Host "==== 6. Reiniciando IIS ===="
+iisreset
+
+Write-Host "==== ✅ Despliegue completado. Prueba en tu navegador ===="

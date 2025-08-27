@@ -77,8 +77,9 @@ else
 {
     //Configuracion de salida de los logs podria implementarse en un servidor de correo para alertas del servicio
     configuracionLogger.WriteTo.File(
-        path: Path.Combine("logs", "Api-log-.txt"),
+        path: Path.Combine(AppContext.BaseDirectory, "logs", "api-log-.txt"),
         rollingInterval: RollingInterval.Day,
+        shared:true,
         outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss} [{Level:u3}] {Message:lj}{NewLine}{Exception}");
 }
 

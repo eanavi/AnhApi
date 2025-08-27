@@ -22,12 +22,12 @@ namespace AnhApi.Mapeos
                 .ForMember(dest => dest.id_estado_empadronamiento, opt => opt.MapFrom(src => src.IdEstadoEmpadronamiento))
                 .ForMember(dest => dest.denominacion, opt => opt.MapFrom(src => src.Denominacion))
                 .ForMember(dest => dest.sigla, opt => opt.MapFrom(src => src.Sigla))
-                .ForMember(dest => dest.identificacion, opt => opt.MapFrom(src => src.Identificacion))
-                .ForMember(dest => dest.tipo_identificacion, opt => opt.MapFrom(src => src.TipoIdentificacion))
                 .ForMember(dest => dest.fecha_registro, opt => opt.Ignore()) // Se asigna en el servicio o la BD
                 .ForMember(dest => dest.direccion, opt => opt.Ignore())
                 .ForMember(dest => dest.telefono, opt => opt.Ignore())
                 .ForMember(dest => dest.correo, opt => opt.Ignore())
+                .ForMember(dest => dest.posicion, opt => opt.Ignore())
+                .ForMember(dest => dest.Documentos, opt => opt.Ignore())
                 .AfterMap((src, dest) =>
                 {
                     // Lógica para mapear los campos JSONB
@@ -45,24 +45,6 @@ namespace AnhApi.Mapeos
                     }
                 });
 
-
-            // Mapeo de Entidad (Modelo) a EntidadListado (DTO de salida)
-            /*
-            CreateMap<Entidad, EntidadListado>()
-                .ForMember(dest => dest.IdEntidad, opt => opt.MapFrom(src => src.id_entidad))
-                .ForMember(dest => dest.Tipo, opt => opt.Ignore())
-                .ForMember(dest => dest.Sociedad, opt => opt.Ignore())
-                .ForMember(dest => dest.Area, opt => opt.Ignore())
-                .ForMember(dest => dest.Localidad, opt => opt.Ignore())
-                .ForMember(dest => dest.Municipio, opt => opt.Ignore())
-                .ForMember(dest => dest.Provincia, opt => opt.Ignore())
-                .ForMember(dest => dest.Departamento, opt => opt.Ignore())
-                .ForMember(dest => dest.Denominacion, opt => opt.MapFrom(src => src.denominacion))
-                .ForMember(dest => dest.Sigla, opt => opt.MapFrom(src => src.sigla))
-                .ForMember(dest => dest.Identificacion, opt => opt.MapFrom(src => src.identificacion))
-                .ForMember(dest => dest.TipoIdentificacion, opt => opt.MapFrom(src => src.tipo_identificacion))
-                .ForMember(dest => dest.EstadoOperacion, opt => opt.MapFrom(src => src.id_estado_operacion)); // Se asume que esto se llenará con un valor de otro servicio
-            */
             // Mapeo de Entidad (Modelo) a EsqEntidad (DTO completo de salida)
             CreateMap<Entidad, EsqEntidad>()
                 .ForMember(dest => dest.IdEntidad, opt => opt.MapFrom(src => src.id_entidad))
@@ -76,11 +58,11 @@ namespace AnhApi.Mapeos
                 .ForMember(dest => dest.IdEstadoEmpadronamiento, opt => opt.MapFrom(src => src.id_estado_empadronamiento))
                 .ForMember(dest => dest.Denominacion, opt => opt.MapFrom(src => src.denominacion))
                 .ForMember(dest => dest.Sigla, opt => opt.MapFrom(src => src.sigla))
-                .ForMember(dest => dest.Identificacion, opt => opt.MapFrom(src => src.identificacion))
-                .ForMember(dest => dest.TipoIdentificacion, opt => opt.MapFrom(src => src.tipo_identificacion))
+                .ForMember(dest => dest.FechaRegistro, opt => opt.MapFrom(src => src.fecha_registro))
                 .ForMember(dest => dest.Direccion, opt => opt.MapFrom(src => src.direccion))
                 .ForMember(dest => dest.Telefono, opt => opt.MapFrom(src => src.telefono))
                 .ForMember(dest => dest.Correo, opt => opt.MapFrom(src => src.correo))
+                .ForMember(dest => dest.Posicion, opt => opt.MapFrom(src => src.posicion))
                 .ForMember(dest => dest.AudEstado, opt => opt.MapFrom(src => src.aud_estado))
                 .ForMember(dest => dest.AudUsuario, opt => opt.MapFrom(src => src.aud_usuario))
                 .ForMember(dest => dest.AudFecha, opt => opt.MapFrom(src => src.aud_fecha))
@@ -100,11 +82,10 @@ namespace AnhApi.Mapeos
                 .ForMember(dest => dest.IdEstadoEmpadronamiento, opt => opt.MapFrom(src => src.id_estado_empadronamiento))
                 .ForMember(dest => dest.Denominacion, opt => opt.MapFrom(src => src.denominacion))
                 .ForMember(dest => dest.Sigla, opt => opt.MapFrom(src => src.sigla))
-                .ForMember(dest => dest.Identificacion, opt => opt.MapFrom(src => src.identificacion))
-                .ForMember(dest => dest.TipoIdentificacion, opt => opt.MapFrom(src => src.tipo_identificacion))
                 .ForMember(dest => dest.Direccion, opt => opt.MapFrom(src => src.direccion))
                 .ForMember(dest => dest.Telefono, opt => opt.MapFrom(src => src.telefono))
                 .ForMember(dest => dest.Correo, opt => opt.MapFrom(src => src.correo))
+                .ForMember(dest => dest.Posicion, opt => opt.MapFrom(src => src.posicion))
                 .ForMember(dest => dest.AudEstado, opt => opt.MapFrom(src => src.aud_estado))
                 .ForMember(dest => dest.AudUsuario, opt => opt.MapFrom(src => src.aud_usuario))
                 .ForMember(dest => dest.AudFecha, opt => opt.MapFrom(src => src.aud_fecha))
@@ -125,12 +106,11 @@ namespace AnhApi.Mapeos
                 .ForMember(dest => dest.id_estado_empadronamiento, opt => opt.MapFrom(src => src.IdEstadoEmpadronamiento))
                 .ForMember(dest => dest.denominacion, opt => opt.MapFrom(src => src.Denominacion))
                 .ForMember(dest => dest.sigla, opt => opt.MapFrom(src => src.Sigla))
-                .ForMember(dest => dest.identificacion, opt => opt.MapFrom(src => src.Identificacion))
-                .ForMember(dest => dest.tipo_identificacion, opt => opt.MapFrom(src => src.TipoIdentificacion))
                 .ForMember(dest => dest.fecha_registro, opt => opt.Ignore()) // No se actualiza la fecha de registro
                 .ForMember(dest => dest.direccion, opt => opt.Ignore())
                 .ForMember(dest => dest.telefono, opt => opt.Ignore())
                 .ForMember(dest => dest.correo, opt => opt.Ignore())
+                .ForMember(dest => dest.posicion, opt => opt.MapFrom( src => src.Posicion))
                 .ForMember(dest => dest.aud_estado, opt => opt.MapFrom(src => src.AudEstado))
                 .ForMember(dest => dest.aud_usuario, opt => opt.MapFrom(src => src.AudUsuario))
                 .ForMember(dest => dest.aud_fecha, opt => opt.MapFrom(src => src.AudFecha))

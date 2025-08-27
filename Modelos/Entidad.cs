@@ -20,12 +20,11 @@ namespace AnhApi.Modelos
         public int? id_estado_empadronamiento { get; set; }
         public string denominacion { get; set; } = null!;
         public string? sigla { get; set; }
-        public string identificacion { get; set; } = null!;
-        public int tipo_identificacion { get; set; }
         public DateTime fecha_registro { get; set; }
         public JsonDocument? direccion { get; set; }
         public JsonDocument? telefono { get; set; }
         public JsonDocument? correo { get; set; }
+        public NetTopologySuite.Geometries.Point? posicion { get; set; }
 
 
         // Propiedades de navegación (Relaciones)
@@ -40,7 +39,6 @@ namespace AnhApi.Modelos
         public ICollection<Entidad>? EntidadesHijas { get; set; }
 
         public ICollection<RepresentanteEntidad> Representantes { get; set; } = new List<RepresentanteEntidad>();
-
         public ICollection<DocumentoEntidad> Documentos { get; set; } = new List<DocumentoEntidad>();
     }
 }
