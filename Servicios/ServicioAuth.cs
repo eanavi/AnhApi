@@ -51,6 +51,7 @@ namespace AnhApi.Servicios
 
                 Modelos.Usuario? usuarioAutenticado = null; //Podria ser un usuario de la BD
                 string rolAutenticacion = "UsuarioGenerico"; //Rol por defeto si no se especifica
+                Guid idUsuario = Guid.Empty;
                 string idUsuarioPToken = Guid.Empty.ToString(); // Id para el Token, puede ser Guid o el int de la DB
 
                 if (esUsuarioLocal)
@@ -79,6 +80,8 @@ namespace AnhApi.Servicios
                     if(await AutenticarJson(nombreUsuarioLdap, request.Clave))
                     //if(await AutenticarConLdapAsync(nombreUsuarioLdap, request.Clave))
                     {
+                        //Actualmente el servicio solo verifica que el nombre se encuentre en la base de datos, no verifica la clave
+                        //la clave debe ser verificada con el Active Directory
                         var usuarioAD = await _contextoBd.Usuarios.FirstOrDefaultAsync(u => u.login.ToUpper() == nombreUsuarioLdap);
 
                         if (usuarioAD == null)
@@ -104,7 +107,7 @@ namespace AnhApi.Servicios
                     _logger.LogWarning($"El formato para login para {request.Login} no corresponde a usuario local ni a usuario AD");
                 }
 
-                if (usuarioAutenticado == null && string.IsNullOrEmpty(idUsuarioPToken))
+                if(usuarioAutenticado == null && idUsuarioPToken == Guid.Empty.ToString())
                 {
                     return null; //Autenticacion fallida//talvez se quiera contar los intentos
                 }
