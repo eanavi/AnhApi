@@ -87,11 +87,11 @@ namespace AnhApi.Controladores
             }
         }
 
-        [HttpGet("{id:guid}")] // Ruta: GET api/personas/{id} - Usamos :guid para validar el formato Guid en la ruta
-        [ProducesResponseType(typeof(EntidadListado), StatusCodes.Status200OK)] // El DTO completo
+        [HttpGet("{id:guid}")] 
+        [ProducesResponseType(typeof(EsqEntidad), StatusCodes.Status200OK)] // El DTO completo
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<EntidadListado>> ObtenerEntidadPorId([FromRoute] Guid id)
+        public async Task<ActionResult<EsqEntidad>> ObtenerEntidadPorId([FromRoute] Guid id)
         {
             try
             {

@@ -1,7 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using AnhApi.Modelos;
-using NetTopologySuite.Geometries;
 
 namespace AnhApi.Esquemas
 {
@@ -37,7 +36,7 @@ namespace AnhApi.Esquemas
         public object? Direccion { get; set; }
         public object? Telefono { get; set; }
         public object? Correo { get; set; }
-        public Point? Posicion { get; set; }
+        public PosicionDto? Posicion { get; set; }
     }
     #endregion
 

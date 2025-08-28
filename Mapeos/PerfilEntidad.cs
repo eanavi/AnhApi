@@ -62,7 +62,14 @@ namespace AnhApi.Mapeos
                 .ForMember(dest => dest.Direccion, opt => opt.MapFrom(src => src.direccion))
                 .ForMember(dest => dest.Telefono, opt => opt.MapFrom(src => src.telefono))
                 .ForMember(dest => dest.Correo, opt => opt.MapFrom(src => src.correo))
-                .ForMember(dest => dest.Posicion, opt => opt.MapFrom(src => src.posicion))
+                // Manejo seguro de la posición
+                .ForMember(dest => dest.Posicion, opt => opt.MapFrom(src =>
+                    (src.posicion == null
+                        || double.IsNaN(src.posicion.X) || double.IsNaN(src.posicion.Y)
+                        || double.IsInfinity(src.posicion.X) || double.IsInfinity(src.posicion.Y))
+                        ? null
+                        : new PosicionDto { Lat = src.posicion.Y, Lng = src.posicion.X }
+                ))
                 .ForMember(dest => dest.AudEstado, opt => opt.MapFrom(src => src.aud_estado))
                 .ForMember(dest => dest.AudUsuario, opt => opt.MapFrom(src => src.aud_usuario))
                 .ForMember(dest => dest.AudFecha, opt => opt.MapFrom(src => src.aud_fecha))
@@ -85,7 +92,13 @@ namespace AnhApi.Mapeos
                 .ForMember(dest => dest.Direccion, opt => opt.MapFrom(src => src.direccion))
                 .ForMember(dest => dest.Telefono, opt => opt.MapFrom(src => src.telefono))
                 .ForMember(dest => dest.Correo, opt => opt.MapFrom(src => src.correo))
-                .ForMember(dest => dest.Posicion, opt => opt.MapFrom(src => src.posicion))
+                .ForMember(dest => dest.Posicion, opt => opt.MapFrom(src =>
+                    (src.posicion == null
+                        || double.IsNaN(src.posicion.X) || double.IsNaN(src.posicion.Y)
+                        || double.IsInfinity(src.posicion.X) || double.IsInfinity(src.posicion.Y))
+                        ? null
+                        : new PosicionDto { Lat = src.posicion.Y, Lng = src.posicion.X }
+                ))
                 .ForMember(dest => dest.AudEstado, opt => opt.MapFrom(src => src.aud_estado))
                 .ForMember(dest => dest.AudUsuario, opt => opt.MapFrom(src => src.aud_usuario))
                 .ForMember(dest => dest.AudFecha, opt => opt.MapFrom(src => src.aud_fecha))
@@ -117,6 +130,24 @@ namespace AnhApi.Mapeos
                 .ForMember(dest => dest.aud_ip, opt => opt.MapFrom(src => src.AudIp))
                 .AfterMap((src, dest) =>
                 {
+
+                    // Crear el Point solo si es válido
+                    if (src.Posicion != null)
+                    {
+                        if (!double.IsNaN(src.Posicion.Lng) && !double.IsNaN(src.Posicion.Lat) &&
+                            !double.IsInfinity(src.Posicion.Lng) && !double.IsInfinity(src.Posicion.Lat))
+                        {
+                            dest.posicion = new NetTopologySuite.Geometries.Point(src.Posicion.Lng, src.Posicion.Lat)
+                            {
+                                SRID = 4326
+                            };
+                        }
+                        else
+                        {
+                            dest.posicion = null;
+                        }
+                    }
+
                     // Lógica para mapear los campos JSONB en la actualización
                     if (src.Direccion != null)
                     {

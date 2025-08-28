@@ -1,0 +1,8 @@
+﻿namespace AnhApi.Esquemas
+{
+    public class PosicionDto
+    {
+        public double Lat { get; set; }
+        public double Lng { get; set; }
+    }
+}
