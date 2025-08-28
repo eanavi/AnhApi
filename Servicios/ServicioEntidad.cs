@@ -104,8 +104,6 @@ namespace AnhApi.Servicios
                         Departamento = e.Departamento,
                         Denominacion = e.Denominacion,
                         Sigla = e.Sigla,
-                        Identificacion = e.Identificacion,
-                        Tipo_Identificacion = e.Tipo_Identificacion,
                         Estado_Operacion = e.Estado_Operacion,
                         Empadronado = e.Empadronado
                     })
@@ -164,8 +162,6 @@ namespace AnhApi.Servicios
                         Departamento = e.Departamento,
                         Denominacion = e.Denominacion,
                         Sigla = e.Sigla,
-                        Identificacion = e.Identificacion,
-                        Tipo_Identificacion = e.Tipo_Identificacion,
                         Estado_Operacion = e.Estado_Operacion,
                         Empadronado = e.Empadronado
                     })

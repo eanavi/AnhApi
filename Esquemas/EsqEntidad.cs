@@ -67,10 +67,6 @@ namespace AnhApi.Esquemas
         public string Denominacion { get; set; }
         [Column("sigla")]
         public string Sigla { get; set; }
-        [Column("identificacion")]
-        public string Identificacion { get; set; }
-        [Column("tipo_identificacion")]
-        public string Tipo_Identificacion { get; set; }
         [Column("estado_operacion")]
         public string Estado_Operacion { get; set; }
         [Column("empadronado")]

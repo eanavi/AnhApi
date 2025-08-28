@@ -27,7 +27,7 @@ if (!string.IsNullOrWhiteSpace(entorno))
 //var httpsPort = Environment.GetEnvironmentVariable("ASPNETCORE_HTTPS_PORT");
 
 var configuracionLogger = new LoggerConfiguration()
-    .MinimumLevel.Debug() // Asegura que los mensajes Debug/Information sean capturados
+    .MinimumLevel.Warning() // Asegura que los mensajes Warning y superiores sean capturados
     .Enrich.FromLogContext()
     .Enrich.WithProperty("ApplicationName", "AnhApi")
     .Enrich.WithProperty("MachineName", Environment.MachineName)
@@ -84,6 +84,8 @@ else
 }
 
 Log.Logger = configuracionLogger.CreateLogger(); // Configura el logger estático de Serilog
+
+builder.Host.UseSerilog(); // Usa Serilog para el logging
 
 // Configuración de la base de datos
 builder.Services.Configure<BdPostgres>(builder.Configuration.GetSection("BDPosgres"));
@@ -249,12 +251,14 @@ builder.Services.AddControllers()
 // Configurar Swagger/OpenAPI
 builder.Services.AddEndpointsApiExplorer();
 
+/*
 //Incluir logging (esto configura el logging para ILogger<T> inyectado en otras clases)
 builder.Services.AddLogging(logging =>
 {
     logging.AddConsole();
     logging.SetMinimumLevel(LogLevel.Debug);
 });
+*/
 
 builder.Services.AddSwaggerGen(c =>
 {
