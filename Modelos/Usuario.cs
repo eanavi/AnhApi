@@ -10,15 +10,10 @@ namespace AnhApi.Modelos
     {
 
         public long id_usuario { get; set; }
-
         public Guid id_persona { get; set; }
-
         public int id_perfil { get; set; }
-
         public string login { get; set; } = null!; // varchar(50) NOT NULL
-
         public string clave { get; set; } = null!; // varchar(100) NOT NULL (almacenará el hash de la contraseña)
-
         public Persona Persona { get; set; } = null!; // Relación con Persona, asumiendo que tienes una clase Persona definida
 
     }

@@ -60,9 +60,13 @@ namespace AnhApi.Servicios
 
                     if (usuarioLocal != null && BCrypt.Net.BCrypt.Verify(request.Clave, usuarioLocal.clave))
                     {
-                       
                         usuarioAutenticado = usuarioLocal;
-                        rolAutenticacion = "usuarioLocal"; //luego implementaremos la busqueda del rol
+                        //buscar el rol en la base de datos
+                        var perfil = await _contextoBd.Perfiles.FirstOrDefaultAsync(p => p.IdPerfil == usuarioLocal.id_perfil);
+                        if (perfil != null)
+                        {
+                            rolAutenticacion = perfil.Descripcion;
+                        }
                         idUsuarioPToken = usuarioAutenticado.id_usuario.ToString();
                     }
                     else

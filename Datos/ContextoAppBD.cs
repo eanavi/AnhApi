@@ -31,6 +31,7 @@ namespace AnhApi.Datos
         public DbSet<Localidad> Localidades { get; set; }
         public DbSet<EntidadListado> EntidadesListado { get; set; }
         public DbSet<RepresentanteEntidad> RepresentantesEntidad { get; set; }
+        public DbSet<Perfil> Perfiles { get; set; }
 
 
 
