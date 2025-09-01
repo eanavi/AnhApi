@@ -2,7 +2,7 @@
 $rutaProyecto = "C:\inetpub\wwwroot\AnhApi"
 $rutaPublicacion = "$rutaProyecto\publish"
 Write-Host "=============== Deteniendo el servidor IIS ============="
-Stop-Website -Name "AnhApi"
+#Stop-Website -Name "AnhApi"
 iisreset /stop
 Write-Host "========== Limpiando la carpeta de publicacion ========="
 cd $rutaProyecto
@@ -17,7 +17,7 @@ Write-Host "=================== Publicando ================"
 dotnet publish -c Release -r win-x64 --self-contained  true -o $rutaPublicacion
 Write-Host "============== creando archivos ==============="
 cd $rutaPublicacion
-New-Item -Path "$rutaPublicacion\.env" -ItemType File -Value "ENTORNO_ASPNETCORE=Production"
+New-Item -Path "$rutaPublicacion\.env" -ItemType File -Value "ENTORNO_ASPNETCORE=Development"
 $rutaLogs = "$rutaPublicacion\logs"
 if(-Not (Test-Path $rutaLogs)){
     New-Item -Path $rutaLogs -ItemType Directory | Out-Null
