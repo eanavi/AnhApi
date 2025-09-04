@@ -34,6 +34,7 @@ namespace AnhApi.Controladores
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
+
         [HttpGet]
         [ProducesResponseType(typeof(PaginacionResultado<EntidadListado>), StatusCodes.Status200OK)]
         [EnableRateLimiting("fijo")]
@@ -87,6 +88,7 @@ namespace AnhApi.Controladores
             }
         }
 
+
         [HttpGet("{id:guid}")] 
         [ProducesResponseType(typeof(EsqEntidad), StatusCodes.Status200OK)] // El DTO completo
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -111,6 +113,7 @@ namespace AnhApi.Controladores
                 return StatusCode(500, "Error interno del servidor");
             }
         }
+
 
         [HttpPost]
         [ProducesResponseType(typeof(Entidad), StatusCodes.Status201Created)]
@@ -137,8 +140,8 @@ namespace AnhApi.Controladores
                 _logger.LogError(ex, "Error al crear la entidad");
                 return StatusCode(500, "Error interno del servidor");
             }
-
         }
+
 
         [HttpPut("{id:guid}")] // Ruta: PUT api/Entidad/{id}
         [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -207,6 +210,7 @@ namespace AnhApi.Controladores
                 return StatusCode(StatusCodes.Status500InternalServerError, "error Interno");
             }
         }
+
 
         [HttpGet("documentos/{id:guid}")]
         [ProducesResponseType(typeof(EntidadListadoDocumentos), StatusCodes.Status200OK)]

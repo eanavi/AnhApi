@@ -1,13 +1,9 @@
 ﻿using AnhApi.Datos;
 using AnhApi.Esquemas;
 using AnhApi.Interfaces;
-using BCrypt.Net;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using System;
 using System.DirectoryServices.Protocols;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net;
@@ -130,7 +126,6 @@ namespace AnhApi.Servicios
                 _logger.LogError(ex, $"error durante el proceso de autenticacion {request.Login}");
                 throw;
             }
-
         }
 
 
@@ -161,8 +156,8 @@ namespace AnhApi.Servicios
             {
                 connection?.Dispose();
             }
-
         }
+
 
         private async Task<bool> AutenticarJson(string nombreCuenta, string password)
         {
@@ -177,8 +172,8 @@ namespace AnhApi.Servicios
                 _logger.LogError(ex, $"Error al autenticar usuario JSON: {nombreCuenta}");
                 return false;
             }
-
         }
+
 
         private JwtSecurityToken GenerarJwtToken(string userId, string nombreUsuario, string rol)
         {
@@ -204,7 +199,6 @@ namespace AnhApi.Servicios
             var minutosExpiracion = Convert.ToDouble(_configuration["Jwt:DurationInMinutes"]);
             var expiraEn = DateTime.UtcNow.AddMinutes(minutosExpiracion);
 
-
             var token = new JwtSecurityToken(
                 issuer: _configuration["Jwt:Issuer"],
                 audience: _configuration["Jwt:Audience"],
@@ -212,9 +206,6 @@ namespace AnhApi.Servicios
                 expires: expiraEn,
                 signingCredentials: credenciales);
             return token;
-
         }
-
-
     }
 }

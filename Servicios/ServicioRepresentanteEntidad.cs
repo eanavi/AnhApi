@@ -52,7 +52,8 @@ namespace AnhApi.Servicios
                     TipoRepresentante = parametros.FirstOrDefault(p => p.codigo == r.tipo_representante)?.descripcion ?? "Desconocido",
                     IdPersona = r.id_persona,
                     IdEntidad = r.id_entidad,
-                    NombreRepresentante = $"{r.Persona.nombre} {r.Persona.primer_apellido} {r.Persona.segundo_apellido}".Trim()
+                    NombreRepresentante = $"{r.Persona.nombre} {r.Persona.primer_apellido} {r.Persona.segundo_apellido}".Trim(),
+                    Ci = r.Persona.numero_identificacion.Trim()
                 });
 
                 return representantesDto;

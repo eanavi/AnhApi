@@ -14,7 +14,8 @@ namespace AnhApi.Mapeos
                 .ForMember(dest => dest.id_persona, opt => opt.MapFrom(src => src.Persona.id_persona))
                 .ForMember(dest => dest.nombre, opt => opt.MapFrom(src => src.Persona.nombre))
                 .ForMember(dest => dest.primer_apellido, opt => opt.MapFrom(src => src.Persona.primer_apellido))
-                .ForMember(dest => dest.segundo_apellido, opt => opt.MapFrom(src => src.Persona.segundo_apellido));
+                .ForMember(dest => dest.segundo_apellido, opt => opt.MapFrom(src => src.Persona.segundo_apellido))
+                .ForMember(dest => dest.numero_identificacion, opt => opt.MapFrom(src => src.Persona.numero_identificacion));
                
         }
     }

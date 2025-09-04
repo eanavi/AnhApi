@@ -246,6 +246,8 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower;
         options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
         options.JsonSerializerOptions.Converters.Add(new JsonDateTimeConverter());
+        options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
+        options.JsonSerializerOptions.WriteIndented = true;
     });
 
 // Configurar Swagger/OpenAPI
@@ -266,7 +268,7 @@ builder.Services.AddSwaggerGen(c =>
     {
         Title = "Microservicio de Login ANH",
         Version = "v1",
-        Description = "API RESTful para manejo de usuarios, personas, sistemas y módulos.",
+        Description = "API RESTful para manejo de usuarios, personas, y entidades.",
         Contact = new OpenApiContact
         {
             Name = "Equipo ANH",

@@ -33,6 +33,9 @@ namespace AnhApi.Datos
         public DbSet<RepresentanteEntidad> RepresentantesEntidad { get; set; }
         public DbSet<Perfil> Perfiles { get; set; }
 
+        public DbSet<CategoriaActividad> CategoriasActividad { get; set; }
+
+        public DbSet<Organigrama> Organigramas { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
