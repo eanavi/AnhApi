@@ -1,11 +1,11 @@
-﻿using AutoMapper;
-using AnhApi.Esquemas;
+﻿using AnhApi.Esquemas;
 using AnhApi.Modelos;
 using AnhApi.Modelos.prm;
+using AutoMapper;
 
 namespace AnhApi.Mapeos
 {
-    public class PerfilDepartamento:Profile
+    public class PerfilDepartamento : Profile
     {
         public PerfilDepartamento()
         {

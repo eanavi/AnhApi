@@ -1,6 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
-using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
 
 namespace AnhApi.Controladores
 {
@@ -13,7 +13,7 @@ namespace AnhApi.Controladores
         private readonly Interfaces.IServicioCategoriaActividad _servicioCategoriaActividad;
         private readonly IMapper _mapper;
         public CategoriaActividadController(
-            ILogger<CategoriaActividadController> logger, 
+            ILogger<CategoriaActividadController> logger,
             Interfaces.IServicioCategoriaActividad servCategoriaActividad,
             IMapper mapper
 

@@ -1,13 +1,13 @@
-﻿using AnhApi.Esquemas; // Para los DTOs de Usuario
-using AnhApi.Modelos;   // Para el modelo de base de datos Usuario
-using AnhApi.Interfaces; // Para UsuarioServicio (que hereda de GenericoServicio)
-using AutoMapper;       // Para IMapper
-using Microsoft.AspNetCore.Mvc; // Para el controlador y los atributos de HTTP
-using Microsoft.Extensions.Logging; // Para ILogger
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using AnhApi.Esquemas; // Para los DTOs de Usuario
+using AnhApi.Interfaces; // Para UsuarioServicio (que hereda de GenericoServicio)
+using AnhApi.Modelos;   // Para el modelo de base de datos Usuario
+using AutoMapper;       // Para IMapper
 using Microsoft.AspNetCore.Authorization; // Para [Authorize]
+using Microsoft.AspNetCore.Mvc; // Para el controlador y los atributos de HTTP
+using Microsoft.Extensions.Logging; // Para ILogger
 
 namespace AnhApi.Controladores
 {
@@ -46,7 +46,7 @@ namespace AnhApi.Controladores
         [ProducesResponseType(StatusCodes.Status400BadRequest)] // Bad Request (validación de modelo)
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<IEnumerable<UsuarioListado>>> ObtenerTodosUsuarios(
-            [FromQuery]PaginacionParametros paginacion)
+            [FromQuery] PaginacionParametros paginacion)
         {
             try
             {

@@ -1,8 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
-using AnhApi.Datos;
+﻿using AnhApi.Datos;
 using AnhApi.Interfaces;
 using AnhApi.Modelos.prm;
 using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 
 namespace AnhApi.Servicios
 {
@@ -12,7 +12,7 @@ namespace AnhApi.Servicios
         private readonly ILogger<ServicioLocalidad> _logger;
         private readonly IMapper _mapper;
 
-        public ServicioLocalidad(ContextoAppBD contextoBd, ILogger<ServicioLocalidad> logger, IMapper mapper) : base (contextoBd, logger)
+        public ServicioLocalidad(ContextoAppBD contextoBd, ILogger<ServicioLocalidad> logger, IMapper mapper) : base(contextoBd, logger)
         {
             _contextoBd = contextoBd ?? throw new ArgumentNullException(nameof(contextoBd));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -23,7 +23,7 @@ namespace AnhApi.Servicios
         {
             try
             {
-                var query = _contextoBd.Set<Localidad>().AsQueryable(); 
+                var query = _contextoBd.Set<Localidad>().AsQueryable();
                 if (string.IsNullOrWhiteSpace(criterio))
                 {
                     query = _contextoBd.Set<Localidad>().Where(p => p.aud_estado == 0);

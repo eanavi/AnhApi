@@ -1,6 +1,6 @@
-﻿using AnhApi.Modelos.prm;
+﻿using AnhApi.Datos;
 using AnhApi.Interfaces;
-using AnhApi.Datos;
+using AnhApi.Modelos.prm;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 
@@ -61,7 +61,7 @@ namespace AnhApi.Servicios
 
                 return pais;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _logger.LogError(ex, "Error al obtener el Pais con id {id}", id);
                 throw;

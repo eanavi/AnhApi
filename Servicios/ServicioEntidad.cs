@@ -1,9 +1,9 @@
 ﻿using AnhApi.Esquemas;
+using AnhApi.Interfaces;
 using AnhApi.Modelos;
-using Npgsql;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
-using AnhApi.Interfaces;
+using Npgsql;
 
 namespace AnhApi.Servicios
 {
@@ -31,7 +31,7 @@ namespace AnhApi.Servicios
                     paginacion = new PaginacionParametros();
                 }
 
-                var listado = await _contexto.EntidadesListado.FromSqlRaw("select * from \"public\".\"buscar_entidad\"(@criterio)", 
+                var listado = await _contexto.EntidadesListado.FromSqlRaw("select * from \"public\".\"buscar_entidad\"(@criterio)",
                     new NpgsqlParameter("criterio", criterio)).ToListAsync();
                 var totalRegistros = listado.Count;
                 var resultado = listado
@@ -176,7 +176,7 @@ namespace AnhApi.Servicios
                     .ToListAsync();
 
 
-                foreach(var r in repres)
+                foreach (var r in repres)
                 {
 
                     entidad.Representantes.Add(new EsqRepresentanteEntidad
@@ -189,7 +189,7 @@ namespace AnhApi.Servicios
                         IdPersona = r.id_persona,
                         IdEntidad = r.id_entidad,
                         NombreRepresentante = r.Persona != null ? $"{r.Persona.nombre} {r.Persona.primer_apellido} {r.Persona.segundo_apellido}".Trim() : "Desconocido"
-                        
+
                     });
                 }
 

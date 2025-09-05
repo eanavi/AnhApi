@@ -1,13 +1,12 @@
-﻿using Microsoft.AspNetCore.RateLimiting;
-using Microsoft.AspNetCore.Authorization;
-using AnhApi.Esquemas;
+﻿using AnhApi.Esquemas;
 using AnhApi.Interfaces;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace AnhApi.Controladores
 {
-
     [ApiController]
     [Route("api/[controller]")]
     [Authorize]

@@ -1,11 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
+﻿using AnhApi.Modelos;
 using Microsoft.EntityFrameworkCore;
-using AnhApi.Modelos;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 
 namespace AnhApi.Datos.Configuraciones
 {
-    public class ConfOrganigrama: IEntityTypeConfiguration<Organigrama>
+    public class ConfOrganigrama : IEntityTypeConfiguration<Organigrama>
     {
         public void Configure(EntityTypeBuilder<Organigrama> entidad)
         {
@@ -28,15 +28,15 @@ namespace AnhApi.Datos.Configuraciones
                 .HasMaxLength(20)
                 .IsRequired(true);
 
-            entidad.Property( e => e.nivel)
+            entidad.Property(e => e.nivel)
                 .HasColumnName("nivel")
                 .IsRequired(false);
 
-            entidad.Property( e => e.tipo_organigrama)
+            entidad.Property(e => e.tipo_organigrama)
                 .HasColumnName("tipo_organigrama")
                 .IsRequired(false);
 
-            entidad.Property( e => e.clase_organigrama)
+            entidad.Property(e => e.clase_organigrama)
                 .HasColumnName("clase_organigrama")
                 .IsRequired(false);
 

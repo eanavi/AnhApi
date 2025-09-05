@@ -1,6 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AnhApi.Modelos.prm;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using AnhApi.Modelos.prm;
 
 namespace AnhApi.Datos.Configuraciones
 {

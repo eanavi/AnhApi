@@ -16,7 +16,7 @@ namespace AnhApi.Mapeos
                 .ForMember(dest => dest.IdCategoriaActividad,
                            opt => opt.MapFrom(src => src.id_categoria_actividad))
                 .ForMember(dest => dest.CategoriaPadre,
-                           opt => opt.MapFrom(src => src.CategoriaPadre!= null ? src.CategoriaPadre.nombre_categoria_actividad: null))
+                           opt => opt.MapFrom(src => src.CategoriaPadre != null ? src.CategoriaPadre.nombre_categoria_actividad : null))
                 .ForMember(dest => dest.NombreCategoriaPadre,
                            opt => opt.MapFrom(src => src.nombre_categoria_actividad));
 

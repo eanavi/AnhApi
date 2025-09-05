@@ -1,7 +1,7 @@
 ﻿// Archivo: AnhApi.Modelos/Usuario.cs
 using System;
-using AnhApi.Interfaces; // Para IAuditable, ya que ModeloBase lo implementa
 using System.ComponentModel.DataAnnotations.Schema; // Para [DatabaseGenerated] si lo usas en el modelo
+using AnhApi.Interfaces; // Para IAuditable, ya que ModeloBase lo implementa
 
 namespace AnhApi.Modelos
 {

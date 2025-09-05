@@ -1,7 +1,7 @@
-﻿using AnhApi.Interfaces;
-using AnhApi.Modelos.prm;
+﻿using System;
+using AnhApi.Interfaces;
 using AnhApi.Modelos;
-using System;
+using AnhApi.Modelos.prm;
 
 namespace AnhApi.Modelos
 {

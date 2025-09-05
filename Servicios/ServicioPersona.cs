@@ -1,20 +1,20 @@
-﻿using AnhApi.Datos; 
-using AnhApi.Modelos;
-using AnhApi.Interfaces;
-using Microsoft.Extensions.Logging;
-using Npgsql;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
+using AnhApi.Datos;
 using AnhApi.Esquemas;
+using AnhApi.Interfaces;
+using AnhApi.Modelos;
 using AutoMapper;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using Npgsql;
 
 namespace AnhApi.Servicios
 {
     public class ServicioPersona : ServicioAuditoria<Persona, Guid>, IServicioPersona
     {
-        private readonly ContextoAppBD _contexto; 
+        private readonly ContextoAppBD _contexto;
         private readonly ILogger<ServicioPersona> _logger;
         private readonly IMapper _mapper;
 

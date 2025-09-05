@@ -1,7 +1,7 @@
-﻿using AnhApi.Modelos.prm;
-using System;
+﻿using System;
 using System.Collections.Generic; // Necesario para ICollection si la usaras aquí
 using AnhApi.Interfaces; // Para IAuditable, si ModeloBase lo implementa
+using AnhApi.Modelos.prm;
 
 namespace AnhApi.Modelos.prm
 {

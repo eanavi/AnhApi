@@ -6,7 +6,7 @@
         public Guid IdEntidad { get; set; } // Identificador de la entidad a la que representa
         public int TipoRepresentante { get; set; } // 1: Representante Legal, 2: Representante Administrativo, 3: Otro
     }
-    public class EsqRepresentanteEntidad: RepresentanteEntidadCreacion
+    public class EsqRepresentanteEntidad : RepresentanteEntidadCreacion
     {
         public int IdRepresentanteEntidad { get; set; } // Identificador único del representante de entidad
         public string? TipoRepresentante { get; set; }

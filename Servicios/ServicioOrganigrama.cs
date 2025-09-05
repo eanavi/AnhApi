@@ -1,5 +1,5 @@
-﻿using AnhApi.Modelos;
-using AnhApi.Interfaces;
+﻿using AnhApi.Interfaces;
+using AnhApi.Modelos;
 using Microsoft.EntityFrameworkCore;
 
 namespace AnhApi.Servicios

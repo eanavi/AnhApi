@@ -1,8 +1,8 @@
 ﻿using AnhApi.Esquemas;
 using AnhApi.Interfaces;
+using AnhApi.Modelos;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
-using AnhApi.Modelos;
 
 namespace AnhApi.Controladores
 {

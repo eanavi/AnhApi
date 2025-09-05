@@ -1,5 +1,5 @@
-﻿using NetTopologySuite.Geometries;
-using System.Text.Json;
+﻿using System.Text.Json;
+using NetTopologySuite.Geometries;
 
 namespace AnhApi.Modelos
 {

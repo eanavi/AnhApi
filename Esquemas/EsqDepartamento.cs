@@ -78,7 +78,7 @@ namespace AnhApi.Esquemas
 
     }
 
-    public class DeptoConProvinciasEsq: EsqDepartamento
+    public class DeptoConProvinciasEsq : EsqDepartamento
     {
         [Required(ErrorMessage = "La lista de provincias no puede ser nula")]
         public ICollection<ProvinciaListado> Provincias { get; set; } = new List<ProvinciaListado>();

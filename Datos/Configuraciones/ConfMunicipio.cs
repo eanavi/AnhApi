@@ -1,6 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AnhApi.Modelos.prm;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using AnhApi.Modelos.prm;
 
 namespace AnhApi.Datos.Configuraciones
 {
@@ -42,7 +42,7 @@ namespace AnhApi.Datos.Configuraciones
 
             // Configuración de la relación de clave foránea con Provincia
             entity.HasOne(m => m.Provincia) // Un Municipio tiene una Provincia
-                  .WithMany( p => p.Municipios) // Una Provincia puede tener muchos Municipios
+                  .WithMany(p => p.Municipios) // Una Provincia puede tener muchos Municipios
                   .HasForeignKey(m => m.id_provincia)
                   .HasConstraintName("fk_provincia_municipio")
                   .IsRequired();

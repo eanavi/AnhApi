@@ -1,7 +1,7 @@
-﻿using AnhApi.Esquemas;
+﻿using System.Text.Json;
+using AnhApi.Esquemas;
 using AnhApi.Modelos;
 using AutoMapper;
-using System.Text.Json;
 
 namespace AnhApi.Mapeos
 {
@@ -123,7 +123,7 @@ namespace AnhApi.Mapeos
                 .ForMember(dest => dest.direccion, opt => opt.Ignore())
                 .ForMember(dest => dest.telefono, opt => opt.Ignore())
                 .ForMember(dest => dest.correo, opt => opt.Ignore())
-                .ForMember(dest => dest.posicion, opt => opt.MapFrom( src => src.Posicion))
+                .ForMember(dest => dest.posicion, opt => opt.MapFrom(src => src.Posicion))
                 .ForMember(dest => dest.aud_estado, opt => opt.MapFrom(src => src.AudEstado))
                 .ForMember(dest => dest.aud_usuario, opt => opt.MapFrom(src => src.AudUsuario))
                 .ForMember(dest => dest.aud_fecha, opt => opt.MapFrom(src => src.AudFecha))

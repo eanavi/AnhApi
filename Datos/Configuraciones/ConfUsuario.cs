@@ -1,6 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AnhApi.Modelos; // Asegúrate de que este using apunte a tu clase Usuario del modelo
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using AnhApi.Modelos; // Asegúrate de que este using apunte a tu clase Usuario del modelo
 
 namespace AnhApi.Datos.Configuraciones
 {

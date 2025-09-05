@@ -13,7 +13,7 @@ namespace AnhApi.Servicios
         private readonly ILogger<ServicioRepresentanteEntidad> _logger;
         private readonly IMapper _mapper;
 
-        public ServicioRepresentanteEntidad(ContextoAppBD contexto, ILogger<ServicioRepresentanteEntidad> logger, IMapper mapper) 
+        public ServicioRepresentanteEntidad(ContextoAppBD contexto, ILogger<ServicioRepresentanteEntidad> logger, IMapper mapper)
             : base(contexto, logger)
         {
             _contexto = contexto;

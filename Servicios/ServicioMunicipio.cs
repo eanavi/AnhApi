@@ -1,9 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
-using AnhApi.Datos;
-using AnhApi.Modelos.prm;
-using AutoMapper;
+﻿using AnhApi.Datos;
 using AnhApi.Esquemas;
 using AnhApi.Interfaces;
+using AnhApi.Modelos.prm;
+using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 
 
 namespace AnhApi.Servicios
@@ -14,7 +14,7 @@ namespace AnhApi.Servicios
         private readonly ILogger<ServicioMunicipio> _logger;
         private readonly IMapper _mapper;
 
-        public ServicioMunicipio(ContextoAppBD contextoBd, ILogger<ServicioMunicipio> logger, IMapper mapper) : base (contextoBd, logger)
+        public ServicioMunicipio(ContextoAppBD contextoBd, ILogger<ServicioMunicipio> logger, IMapper mapper) : base(contextoBd, logger)
         {
             _contextoBd = contextoBd ?? throw new ArgumentNullException(nameof(contextoBd));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -29,10 +29,11 @@ namespace AnhApi.Servicios
                 if (string.IsNullOrWhiteSpace(criterio))
                 {
                     query = _contextoBd.Set<Municipio>().Where(p => p.aud_estado == 0);
-                } else
+                }
+                else
                 {
                     query = _contextoBd.Set<Municipio>()
-                        .FromSqlRaw("Select * from \"public\".\"buscar_municipio\"(@criterio)", 
+                        .FromSqlRaw("Select * from \"public\".\"buscar_municipio\"(@criterio)",
                         new Npgsql.NpgsqlParameter("criterio", criterio));
                 }
                 return await query.ToListAsync();

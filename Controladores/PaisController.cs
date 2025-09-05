@@ -1,8 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using AutoMapper;
-using AnhApi.Esquemas;
-using AnhApi.Modelos.prm;
+﻿using AnhApi.Esquemas;
 using AnhApi.Interfaces;
+using AnhApi.Modelos.prm;
+using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
 
 namespace AnhApi.Controladores
 {
@@ -121,7 +121,7 @@ namespace AnhApi.Controladores
             try
             {
                 var paisConD = await _servPais.ObtenerPaisConDepartamentosAsync(id);
-                if(paisConD == null)
+                if (paisConD == null)
                 {
                     return NotFound($"No se encontro un pais con el Id {id}");
                 }
@@ -137,7 +137,7 @@ namespace AnhApi.Controladores
 
 
         [HttpPost]
-        [ProducesResponseType(typeof(EsqPais),StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(EsqPais), StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<EsqPais>> CrearPais([FromBody] PaisCreacion paisCreacion)
@@ -187,7 +187,7 @@ namespace AnhApi.Controladores
                     return NotFound($"Parametro con ID {id} no encontrado");
                 }
                 return NoContent();
-            } 
+            }
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"Error al actualizar el parametro con ID {id}");

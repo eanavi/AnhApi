@@ -1,6 +1,6 @@
-﻿using AnhApi.Interfaces;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using AnhApi.Interfaces;
 
 namespace AnhApi.Modelos
 {
@@ -9,7 +9,7 @@ namespace AnhApi.Modelos
         public int aud_estado { get; set; } = 0;
 
         public string aud_usuario { get; set; }
-        public string aud_ip{ get; set; }
+        public string aud_ip { get; set; }
         public DateTime aud_fecha { get; set; } = DateTime.UtcNow;
     }
 }

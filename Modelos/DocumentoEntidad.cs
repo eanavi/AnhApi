@@ -1,6 +1,6 @@
 ﻿using System;
-using AnhApi.Interfaces; // Asegúrate de que ModeloBase o IAuditable están aquí
 using System.Collections.Generic; // Para colecciones si las hubiera
+using AnhApi.Interfaces; // Asegúrate de que ModeloBase o IAuditable están aquí
 
 namespace AnhApi.Modelos
 {

@@ -2,7 +2,7 @@
 
 namespace AnhApi.Interfaces
 {
-    public interface IServicioOrganigrama : IServicioAuditoria<Organigrama,int>
+    public interface IServicioOrganigrama : IServicioAuditoria<Organigrama, int>
     {
 
     }

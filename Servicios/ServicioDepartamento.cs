@@ -13,7 +13,7 @@ namespace AnhApi.Servicios
         private readonly ILogger<ServicioDepartamento> _logger;
         private readonly IMapper _mapper;
 
-        public ServicioDepartamento(ContextoAppBD contextoBd, ILogger<ServicioDepartamento> logger, IMapper mapper):base(contextoBd, logger)
+        public ServicioDepartamento(ContextoAppBD contextoBd, ILogger<ServicioDepartamento> logger, IMapper mapper) : base(contextoBd, logger)
         {
             _contextoBd = contextoBd ?? throw new ArgumentNullException(nameof(contextoBd));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -61,7 +61,7 @@ namespace AnhApi.Servicios
 
                 return depto;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _logger.LogError(ex, "Error al obtener el departamento con id {id}", id);
                 throw;

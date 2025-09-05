@@ -1,6 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AnhApi.Modelos; // Para el modelo Departamento
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using AnhApi.Modelos; // Para el modelo Departamento
 
 namespace AnhApi.Datos.Configuraciones
 {
@@ -59,7 +59,7 @@ namespace AnhApi.Datos.Configuraciones
             // Un Departamento tiene un Pais (HasOne)
             entity.HasOne(d => d.Pais)
                   // Un Pais puede tener muchos Departamentos (WithMany)
-                  .WithMany( p => p.Departamentos)
+                  .WithMany(p => p.Departamentos)
                   .HasForeignKey(d => d.id_pais) // La clave foránea es 'id_pais' en la tabla 'departamento'
                   .HasConstraintName("fk_pais_departamento") // Nombre de la restricción FK en la DB
                   .IsRequired(); // id_pais es NOT NULL en la tabla departamento

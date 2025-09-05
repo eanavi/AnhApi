@@ -1,19 +1,19 @@
-﻿using AnhApi.Datos;
+﻿using System.DirectoryServices.Protocols;
+using System.IdentityModel.Tokens.Jwt;
+using System.Net;
+using System.Security.Claims;
+using System.Text;
+using AnhApi.Datos;
 using AnhApi.Esquemas;
 using AnhApi.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using System.DirectoryServices.Protocols;
-using System.IdentityModel.Tokens.Jwt;
-using System.Net;
-using System.Security.Claims;
-using System.Text;
 
 
 namespace AnhApi.Servicios
 {
-    public class ServicioAuth : IServicioAuth    
+    public class ServicioAuth : IServicioAuth
     {
         private readonly ContextoAppBD _contextoBd;
         private readonly IConfiguration _configuration;
@@ -69,7 +69,7 @@ namespace AnhApi.Servicios
                     {
                         _logger.LogWarning($"Login local fallido para el usuario {request.Login}");
                     }
-                } 
+                }
                 else if (esUsuarioLdap)
                 {
                     string nombreUsuarioLdap = request.Login;
@@ -77,7 +77,7 @@ namespace AnhApi.Servicios
                         nombreUsuarioLdap = nombreUsuarioLdap.Trim().ToUpper() + _dominio;
 
                     //string nombreUsuarioLdap = request.Login.Replace($"@{_ldapOptions.Domain}", "");
-                    if(await AutenticarJson(nombreUsuarioLdap, request.Clave))
+                    if (await AutenticarJson(nombreUsuarioLdap, request.Clave))
                     //if(await AutenticarConLdapAsync(nombreUsuarioLdap, request.Clave))
                     {
                         //Actualmente el servicio solo verifica que el nombre se encuentre en la base de datos, no verifica la clave
@@ -107,7 +107,7 @@ namespace AnhApi.Servicios
                     _logger.LogWarning($"El formato para login para {request.Login} no corresponde a usuario local ni a usuario AD");
                 }
 
-                if(usuarioAutenticado == null && idUsuarioPToken == Guid.Empty.ToString())
+                if (usuarioAutenticado == null && idUsuarioPToken == Guid.Empty.ToString())
                 {
                     return null; //Autenticacion fallida//talvez se quiera contar los intentos
                 }
@@ -121,7 +121,7 @@ namespace AnhApi.Servicios
                     FechaExpiracion = token.ValidTo
                 };
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _logger.LogError(ex, $"error durante el proceso de autenticacion {request.Login}");
                 throw;

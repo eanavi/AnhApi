@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+
 namespace AnhApi.Modelos
 {
     public class Persona : ModeloBase

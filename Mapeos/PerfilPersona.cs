@@ -1,7 +1,7 @@
-﻿using AutoMapper;
-using AnhApi.Modelos;
+﻿using System.Text.Json;
 using AnhApi.Esquemas;
-using System.Text.Json;
+using AnhApi.Modelos;
+using AutoMapper;
 using Microsoft.Extensions.Options;
 
 namespace AnhApi.Mapeos
@@ -141,14 +141,14 @@ namespace AnhApi.Mapeos
                 .ForMember(dest => dest.direccion, opt => opt.Ignore()) //sera mapeado de forma particular
                 .ForMember(dest => dest.telefono, opt => opt.Ignore()) //sera mapeado de forma particular
                 .ForMember(dest => dest.correo, opt => opt.Ignore()) //sera mapeado de forma particular
-                
+
                 .ForMember(dest => dest.aud_estado, opt => opt.MapFrom(src => src.AudEstado))
                 .ForMember(dest => dest.aud_usuario, opt => opt.MapFrom(src => src.AudUsuario))
                 .ForMember(dest => dest.aud_fecha, opt => opt.MapFrom(src => src.AudFecha))
                 .ForMember(dest => dest.aud_ip, opt => opt.MapFrom(src => src.AudIp))
 
                 //Mapeado del campo Direccion, Telefono
-                .AfterMap((src, dest) => 
+                .AfterMap((src, dest) =>
                 {
                     //Direccion
                     if (src.Direccion != null)
@@ -183,13 +183,14 @@ namespace AnhApi.Mapeos
                             dest.telefono = null; // Manejo de error si la serialización falla
                             throw new ApplicationException("Error al serializar el teléfono.", ex);
                         }
-                    } else
+                    }
+                    else
                     {
                         dest.telefono = null; // Si no hay teléfono, se establece como null
                     }
 
                     //Correo
-                    if( src.Correo != null)
+                    if (src.Correo != null)
                     {
                         try
                         {
@@ -201,7 +202,8 @@ namespace AnhApi.Mapeos
                             dest.correo = null; // Manejo de error si la serialización falla
                             throw new ApplicationException("Error al serializar el correo.", ex);
                         }
-                    } else
+                    }
+                    else
                     {
                         dest.correo = null; // Si no hay correo, se establece como null
                     }

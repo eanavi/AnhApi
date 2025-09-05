@@ -1,8 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authorization;
-using AutoMapper;
-using AnhApi.Esquemas;
+﻿using AnhApi.Esquemas;
 using AnhApi.Modelos;
+using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace AnhApi.Controladores
 {
@@ -34,7 +34,7 @@ namespace AnhApi.Controladores
         private List<OrganigramaNodoDto> ConstruirJerarquia(IEnumerable<Organigrama> organigramas, Dictionary<int, OrganigramaNodoDto> diccionario)
         {
             List<OrganigramaNodoDto> raiz = new();
-            foreach(var org in organigramas)
+            foreach (var org in organigramas)
             {
                 if (org.id_organigrama_padre.HasValue)
                 {
@@ -74,7 +74,7 @@ namespace AnhApi.Controladores
                 _logger.LogError(ex, $"Error al obtener las unidades");
                 return StatusCode(500, $"Error Interno del servidor");
             }
-                
+
         }
 
 
@@ -116,7 +116,7 @@ namespace AnhApi.Controladores
             try
             {
                 var organigrama = await _servicioOrganigrama.ObtenerPorIdAsync(id);
-                if(organigrama == null)
+                if (organigrama == null)
                 {
                     return NotFound($"no se encontro la unidad organizacional requerida con el id {id}");
                 }
@@ -152,7 +152,7 @@ namespace AnhApi.Controladores
 
                 return CreatedAtAction(nameof(ObtenerPorIdAsync), new { id = esqOrg.id_organigrama }, esqOrg);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _logger.LogError(ex, "Error al crear una nueva persona.");
                 return StatusCode(500, "Error interno del servidor al crear la unidad");
@@ -198,7 +198,7 @@ namespace AnhApi.Controladores
                 _logger.LogError(ex, $"Error al actualizar la unidad con id  {id} ");
                 return StatusCode(500, $"Error interno del servidor al actualizar la persona con Id {id}");
             }
-            
+
         }
 
 
@@ -223,7 +223,7 @@ namespace AnhApi.Controladores
 
                 return NoContent();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _logger.LogError(ex, $"Error al eliminar la unidad con id {id}");
                 return StatusCode(500, $"error Interno ");

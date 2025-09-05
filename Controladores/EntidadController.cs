@@ -2,16 +2,16 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AnhApi.Datos;
+using AnhApi.Esquemas;
+using AnhApi.Interfaces;
+using AnhApi.Modelos;
+using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using AnhApi.Datos;
-using AnhApi.Modelos;
-using AnhApi.Interfaces;
-using Microsoft.AspNetCore.Authorization;
-using AutoMapper;
-using AnhApi.Esquemas;
 using Microsoft.AspNetCore.RateLimiting;
+using Microsoft.EntityFrameworkCore;
 
 namespace AnhApi.Controladores
 {
@@ -89,7 +89,7 @@ namespace AnhApi.Controladores
         }
 
 
-        [HttpGet("{id:guid}")] 
+        [HttpGet("{id:guid}")]
         [ProducesResponseType(typeof(EsqEntidad), StatusCodes.Status200OK)] // El DTO completo
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]

@@ -1,11 +1,11 @@
-﻿using AnhApi.Interfaces;
+﻿using AnhApi.Esquemas;
+using AnhApi.Interfaces;
 using AnhApi.Modelos;
-using AnhApi.Esquemas;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace AnhApi.Controladores
 {
@@ -37,7 +37,7 @@ namespace AnhApi.Controladores
         [ProducesResponseType(StatusCodes.Status500InternalServerError)] // Error Interno del servidor
         public async Task<ActionResult<PaginacionResultado<EsqRepresentanteEntidad>>> ObtenerTodosRepresentantes([FromQuery] PaginacionParametros paginacion)
         {
-            
+
             try
             {
                 if (!ModelState.IsValid)

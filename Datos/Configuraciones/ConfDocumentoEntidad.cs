@@ -1,6 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AnhApi.Modelos; // Para el modelo DocumentoEntidad
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using AnhApi.Modelos; // Para el modelo DocumentoEntidad
 
 namespace AnhApi.Datos.Configuraciones
 {

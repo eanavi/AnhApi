@@ -1,11 +1,11 @@
 ﻿using AnhApi.Esquemas; // Para las clases PaisCreacion, PaisListado, PaisEsq
-using AnhApi.Modelos.prm; // Para la clase Pais (modelo de Entity Framework Core)
 using AnhApi.Modelos;
+using AnhApi.Modelos.prm; // Para la clase Pais (modelo de Entity Framework Core)
 using AutoMapper;
 
 namespace AnhApi.Mapeos
 {
-    public class PerfilPais: Profile
+    public class PerfilPais : Profile
     {
         public PerfilPais()
         {

@@ -1,12 +1,12 @@
 ﻿// Archivo: AnhApi.Api.Controladores/ParametroController.cs
+using System.Security.Claims; // Para obtener información del usuario autenticado
+using AnhApi.Esquemas; // Para los DTOs PaisCreacion, PaisListado, PaisEsq, PaginacionResultado, PaginacionParametros
 using AnhApi.Interfaces; // Para IParametroServicio, ILogger
 using AnhApi.Modelos.prm; // Para el modelo Parametro
-using AnhApi.Esquemas; // Para los DTOs PaisCreacion, PaisListado, PaisEsq, PaginacionResultado, PaginacionParametros
 using AnhApi.Servicios; // Para ParametroServicio
 using AutoMapper; // Para el mapeo entre modelos y DTOs
 using Microsoft.AspNetCore.Mvc; // Para [ApiController], [Route], ActionResult, etc.
 using Microsoft.Extensions.Logging; // Para ILogger
-using System.Security.Claims; // Para obtener información del usuario autenticado
 
 namespace AnhApi.Api.Controladores
 {
@@ -77,7 +77,7 @@ namespace AnhApi.Api.Controladores
         [ProducesResponseType(typeof(IEnumerable<ParametroCmb>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<IEnumerable<ParametroCmb>>> ObtenerGrupo([FromRoute] string grupo) 
+        public async Task<ActionResult<IEnumerable<ParametroCmb>>> ObtenerGrupo([FromRoute] string grupo)
         {
             try
             {
@@ -96,7 +96,7 @@ namespace AnhApi.Api.Controladores
                 return StatusCode(StatusCodes.Status500InternalServerError, $"Error interno del servidor al obtener el grupo {grupo}");
             }
         }
-        
+
 
         /// <summary>
         /// Obtiene un parámetro por su ID.

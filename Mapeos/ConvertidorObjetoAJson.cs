@@ -1,5 +1,5 @@
-﻿using AutoMapper;
-using System.Text.Json;
+﻿using System.Text.Json;
+using AutoMapper;
 
 namespace AnhApi.Mapeos
 {

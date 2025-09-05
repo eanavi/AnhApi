@@ -1,5 +1,6 @@
-﻿using AnhApi.Modelos;
-using AnhApi.Esquemas;
+﻿using AnhApi.Esquemas;
+using AnhApi.Modelos;
+
 namespace AnhApi.Interfaces
 {
     public interface IServicioUsuario : IServicioAuditoria<Usuario, long>

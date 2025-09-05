@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace AnhApi.Servicios
 {
-    public class ServicioGenerico<T, TKey> : IServicioGenerico<T, TKey> where T:class, ICampoEstado
+    public class ServicioGenerico<T, TKey> : IServicioGenerico<T, TKey> where T : class, ICampoEstado
     {
         private readonly ContextoAppBD _contextoBD;
         private readonly ILogger<ServicioGenerico<T, TKey>> _logger;
@@ -27,7 +27,7 @@ namespace AnhApi.Servicios
             try
             {
                 var regExistente = await _dbSet.FindAsync(id);
-                if(regExistente == null || regExistente.aud_estado != 0)
+                if (regExistente == null || regExistente.aud_estado != 0)
                 {
                     _logger.LogWarning($"No se puede actualizar un registro de tipo {typeof(T).Name} con id {id} no encontrado o registro eliminado");
                     return false;
@@ -36,7 +36,7 @@ namespace AnhApi.Servicios
                 _contextoBD.Entry(regExistente).State = EntityState.Detached;
 
                 var propId = typeof(T).GetProperty("Id") ?? typeof(T).GetProperty("id");
-                if(propId != null && propId.CanWrite)
+                if (propId != null && propId.CanWrite)
                 {
                     propId.SetValue(regExistente, id);
                 }
@@ -49,13 +49,13 @@ namespace AnhApi.Servicios
                 await _contextoBD.SaveChangesAsync();
                 return true;
 
-            } 
-            catch(DbUpdateConcurrencyException ex)
+            }
+            catch (DbUpdateConcurrencyException ex)
             {
                 _logger.LogError(ex, $"Error de concurrencia con el registro {typeof(T).Name} con id {id}");
                 throw new ApplicationException($"Error al actualizar {typeof(T).Name}", ex);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 _logger.LogError(e, $"Error inesperado al actualizar registro de tipo {typeof(T).Name} con id {id}");
                 throw;
@@ -71,7 +71,7 @@ namespace AnhApi.Servicios
                 await _contextoBD.SaveChangesAsync();
                 return entidad;
             }
-            catch(DbUpdateException ex)
+            catch (DbUpdateException ex)
             {
                 _logger.LogError(ex, $"Error de base de datos al crear registro de tipo {typeof(T).Name}");
                 throw new ApplicationException($"Error de base de datos al crear registro de tipo {typeof(T).Name},", ex);
@@ -94,7 +94,7 @@ namespace AnhApi.Servicios
                 await _contextoBD.SaveChangesAsync();
                 return true;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _logger.LogError(ex, $"Error al eliminar logicamente el registro del tipo {typeof(T).Name} con id {id}");
                 throw;
@@ -106,7 +106,7 @@ namespace AnhApi.Servicios
             try
             {
                 var regExistente = await _dbSet.FindAsync(id);
-                if(regExistente == null)
+                if (regExistente == null)
                 {
                     _logger.LogWarning($"No se puede eliminar fisicamente la entidad de tipo {typeof(T).Name} con id {id}. No encontrado");
                     return null;
@@ -117,7 +117,7 @@ namespace AnhApi.Servicios
                 _logger.LogInformation($"Entidad de tipo {typeof(T).Name} con id {id} Eliminada fisicamete");
                 return regExistente;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _logger.LogError(ex, $"Error al eliminar fisicamente registro {typeof(T).Name} con id {id}");
                 throw;
@@ -130,13 +130,13 @@ namespace AnhApi.Servicios
             {
                 var entidad = await _dbSet.FindAsync(id);
 
-                if(entidad == null)
+                if (entidad == null)
                 {
                     _logger.LogWarning($"Registro de tipo {typeof(T).Name} con id {id} no encontrado");
-                    throw null!; 
+                    throw null!;
                 }
 
-                if(entidad.aud_estado != 0)
+                if (entidad.aud_estado != 0)
                 {
                     _logger.LogWarning($"Entidad de tipo {typeof(T).Name} con id {id} con estado no vigente");
                     throw null!;
@@ -160,7 +160,7 @@ namespace AnhApi.Servicios
                 query = query.Where(e => e.aud_estado == 0);
                 var entidades = await query.ToListAsync();
                 return entidades;
-                
+
             }
             catch (Exception ex)
             {
@@ -173,7 +173,7 @@ namespace AnhApi.Servicios
         {
             try
             {
-                if(parametrosPag == null)
+                if (parametrosPag == null)
                 {
                     parametrosPag = new PaginacionParametros();
                 }

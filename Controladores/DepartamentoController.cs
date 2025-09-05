@@ -1,10 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.RateLimiting;
-using Microsoft.AspNetCore.Authorization;
-using AnhApi.Esquemas;
+﻿using AnhApi.Esquemas;
+using AnhApi.Interfaces;
 using AnhApi.Modelos;
 using AutoMapper;
-using AnhApi.Interfaces;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 
 namespace AnhApi.Controladores
@@ -132,12 +132,12 @@ namespace AnhApi.Controladores
             try
             {
                 var deptoConProv = await _servDepartamento.ObtenerDeptoConProvinciasAsync(id);
-                if(deptoConProv == null)
+                if (deptoConProv == null)
                 {
                     return NotFound($"no se encontro un departamento cn el id {id}");
                 }
                 var deptoConPEsq = _mapper.Map<DeptoConProvinciasEsq>(deptoConProv);
-                return Ok(deptoConPEsq);  
+                return Ok(deptoConPEsq);
             }
             catch (Exception ex)
             {

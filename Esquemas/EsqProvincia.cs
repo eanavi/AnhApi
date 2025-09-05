@@ -22,7 +22,7 @@ namespace AnhApi.Esquemas
 
         [Required(ErrorMessage = "El ID auxiliar de la provincia es requerido.")]
         public int IdProvinciaAux { get; set; }
-        
+
         [Required(ErrorMessage = "El ID del departamento es requerido.")]
         public int IdDepartamento { get; set; }
         [Required(ErrorMessage = "El nombre de la provincia es requerido.")]
@@ -36,13 +36,13 @@ namespace AnhApi.Esquemas
         public int? AudEstado { get; set; }
     }
 
-    public class ProvConMunicipiosEsq : EsqProvincia 
+    public class ProvConMunicipiosEsq : EsqProvincia
     {
         [Required(ErrorMessage = "La lista de municipios no puede ser nula")]
         public ICollection<MunicipioListado> Municipios { get; set; } = new List<MunicipioListado>();
     }
 
-    public class ProvConLocalidadesEsq: EsqProvincia
+    public class ProvConLocalidadesEsq : EsqProvincia
     {
         [Required(ErrorMessage = "La Lista de localidades no puede ser nula")]
         public ICollection<LocalidadListado> Localidades { get; set; } = new List<LocalidadListado>();

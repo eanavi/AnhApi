@@ -1,5 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
+
 namespace AnhApi.Esquemas
 {
     #region CreacionLocalidad

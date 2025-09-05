@@ -13,7 +13,7 @@ namespace AnhApi.Mapeos
                 .ForMember(dest => dest.id_persona, opt => opt.MapFrom(src => src.IdPersona))
                 .ForMember(dest => dest.login, opt => opt.MapFrom(src => src.Login))
                 .ForMember(dest => dest.clave, opt => opt.MapFrom(src => src.Clave))
-                .ForMember(dest => dest.id_perfil, opt =>opt.MapFrom(src => src.IdPerfil));
+                .ForMember(dest => dest.id_perfil, opt => opt.MapFrom(src => src.IdPerfil));
             // Asumiendo que los campos de auditoria los asume el controlador 
 
             // --- Mapeo para el Listado (GET /api/usuarios) ---
@@ -30,7 +30,7 @@ namespace AnhApi.Mapeos
             CreateMap<Modelos.Usuario, Esquemas.EsqUsuario>()
                 .IncludeBase<Modelos.Usuario, Esquemas.UsuarioListado>() // AutoMapper will apply the base mapping
                 .ForMember(dest => dest.Clave, opt => opt.MapFrom(src => src.clave));
- 
+
             // --- Mapeo para actualizacion UPDATING (PUT/PATCH) ---
             // de Esquemas.UsuarioEsq (full input DTO) a Modelos.Usuario (DB entity)
             CreateMap<Esquemas.EsqUsuario, Modelos.Usuario>()

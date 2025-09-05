@@ -1,16 +1,17 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AnhApi.Datos;
+using AnhApi.Esquemas;
 using AnhApi.Interfaces;
 using AnhApi.Modelos;
-using AnhApi.Esquemas;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+
 namespace AnhApi.Servicios
 {
-    public class ServicioAuditoria<T, TKey> : IServicioAuditoria<T, TKey> where T:class, IAuditable   
+    public class ServicioAuditoria<T, TKey> : IServicioAuditoria<T, TKey> where T : class, IAuditable
     {
         private readonly ContextoAppBD _contexto;
         private readonly ILogger<ServicioAuditoria<T, TKey>> _logger;
@@ -43,7 +44,7 @@ namespace AnhApi.Servicios
         {
             try
             {
-                if( paginacion == null)
+                if (paginacion == null)
                 {
                     paginacion = new PaginacionParametros(); // Asigna valores por defecto si es nulo
                 }
@@ -65,7 +66,7 @@ namespace AnhApi.Servicios
                     TamanoPagina = paginacion.TamanoPagina,
                     TotalPaginas = (int)Math.Ceiling((double)totalRegistros / paginacion.TamanoPagina)
                 };
-        
+
             }
             catch (Exception ex)
             {

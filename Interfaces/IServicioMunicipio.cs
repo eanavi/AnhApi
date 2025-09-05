@@ -1,4 +1,5 @@
 ﻿using AnhApi.Modelos.prm;
+
 namespace AnhApi.Interfaces
 {
     public interface IServicioMunicipio : IServicioGenerico<Municipio, int>

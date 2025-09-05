@@ -6,7 +6,7 @@ namespace AnhApi.Modelos.prm
     public class Jerarquia
     {
         public int id { get; set; }
-        public string detalle{ get; set; }
+        public string detalle { get; set; }
         public string nivel { get; set; }
     }
 }

@@ -1,13 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using System.Linq;
-using AutoMapper;
-
+using System.Threading.Tasks;
 using AnhApi.Datos;
 using AnhApi.Esquemas;
-using AnhApi.Modelos.prm;
 using AnhApi.Interfaces;
+using AnhApi.Modelos.prm;
+using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 
 namespace AnhApi.Servicios
 {

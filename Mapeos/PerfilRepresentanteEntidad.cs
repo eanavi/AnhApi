@@ -1,6 +1,6 @@
-﻿using AutoMapper;
+﻿using AnhApi.Esquemas;
 using AnhApi.Modelos;
-using AnhApi.Esquemas;
+using AutoMapper;
 
 
 namespace AnhApi.Mapeos
@@ -16,7 +16,7 @@ namespace AnhApi.Mapeos
                 .ForMember(dest => dest.primer_apellido, opt => opt.MapFrom(src => src.Persona.primer_apellido))
                 .ForMember(dest => dest.segundo_apellido, opt => opt.MapFrom(src => src.Persona.segundo_apellido))
                 .ForMember(dest => dest.numero_identificacion, opt => opt.MapFrom(src => src.Persona.numero_identificacion));
-               
+
         }
     }
 }

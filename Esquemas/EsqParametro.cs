@@ -2,7 +2,6 @@
 
 namespace AnhApi.Esquemas
 {
-
     /// <summary>
     /// Son los campos necesarios para crear un nuevo parámetro.
     /// </summary>

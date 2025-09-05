@@ -1,14 +1,14 @@
-﻿using AnhApi.Esquemas; 
-using AnhApi.Modelos;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using AnhApi.Esquemas;
 using AnhApi.Interfaces;
+using AnhApi.Modelos;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace AnhApi.Controladores
 {
@@ -35,7 +35,7 @@ namespace AnhApi.Controladores
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
- 
+
 
         /// <summary>
         /// Obtiene una lista de todas las personas activas (vista de listado reducido).
@@ -49,7 +49,7 @@ namespace AnhApi.Controladores
         [ProducesResponseType(401)]//No autorizado
         [ProducesResponseType(500)]
         public async Task<ActionResult<PaginacionResultado<PersonaListado>>> ObtenerTodasPersonas(
-            [FromQuery]PaginacionParametros parametros)
+            [FromQuery] PaginacionParametros parametros)
         {
             try
             {
@@ -145,14 +145,14 @@ namespace AnhApi.Controladores
             }
         }
 
-        
+
         /// <summary>
         /// Crea una nueva persona.
         /// </summary>
         /// <param name="personaCreacionDto">Los datos de la persona a crear.</param>
         /// <returns>La Persona (DTO completo) creada.</returns>
         [HttpPost] // Ruta: POST api/personas
-        [ProducesResponseType(typeof(Persona),StatusCodes.Status201Created)] // Devuelve el DTO completo de la persona creada
+        [ProducesResponseType(typeof(Persona), StatusCodes.Status201Created)] // Devuelve el DTO completo de la persona creada
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<Persona>> CrearPersona(
@@ -165,13 +165,13 @@ namespace AnhApi.Controladores
                     return BadRequest(ModelState); // Devuelve errores de validación del DTO
                 }
 
-                
+
                 var nuevaPersona = _mapper.Map<Persona>(personaCreacionDto);
 
                 string usuarioAuditoria = User.Identity?.Name ?? "sistema_api"; // Usuario que realiza la acción
                 string ipAuditoria = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "::1"; // IP del cliente
 
-                var personaCreada = await _personaServ.CrearAsync(nuevaPersona, usuarioAuditoria, ipAuditoria); 
+                var personaCreada = await _personaServ.CrearAsync(nuevaPersona, usuarioAuditoria, ipAuditoria);
                 // Pasar los campos de auditoría al servicio base
 
                 // al DTO completo para la respuesta.
@@ -179,7 +179,7 @@ namespace AnhApi.Controladores
 
                 // 201 Created: Indica que se creó un nuevo recurso y devuelve su ubicación.
                 return CreatedAtAction(nameof(ObtenerPersonaPorId),
-                                       new { id = personaDto.id_persona},
+                                       new { id = personaDto.id_persona },
                                        personaDto);
             }
             catch (Exception ex)
@@ -189,7 +189,7 @@ namespace AnhApi.Controladores
             }
         }
 
-       
+
 
         /// <summary>
         /// Actualiza una persona existente.

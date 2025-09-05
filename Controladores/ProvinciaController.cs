@@ -1,9 +1,9 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.RateLimiting;
-using Microsoft.AspNetCore.Mvc;
+﻿using AnhApi.Esquemas;
 using AnhApi.Interfaces;
-using AnhApi.Esquemas;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 
 namespace AnhApi.Controladores
@@ -104,7 +104,7 @@ namespace AnhApi.Controladores
             try
             {
                 var provConMuni = await _servProvincia.ObtenerProvinciaConMunicipiosAsync(id);
-                if(provConMuni == null)
+                if (provConMuni == null)
                 {
                     return NotFound($"No se encontro una provincia con el id {id}");
                 }
@@ -129,15 +129,15 @@ namespace AnhApi.Controladores
             try
             {
                 var provConLoc = await _servProvincia.ObtenerProvinciaConLocalidadesAsync(id);
-                if(provConLoc == null)
+                if (provConLoc == null)
                 {
-                    return NotFound($"No se encontro una provincia con el id {id}");    
+                    return NotFound($"No se encontro una provincia con el id {id}");
                 }
 
                 var provConLocEsq = _mapper.Map<ProvConLocalidadesEsq>(provConLoc);
                 return Ok(provConLocEsq);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _logger.LogError(ex, $"Error al obtener la provinicia con id {id}");
                 return StatusCode(StatusCodes.Status500InternalServerError, "Error Interno");

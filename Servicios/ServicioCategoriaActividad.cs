@@ -1,9 +1,9 @@
-﻿using AnhApi.Modelos;
+﻿using AnhApi.Esquemas;
 using AnhApi.Interfaces;
+using AnhApi.Modelos;
 using AutoMapper;
-using AnhApi.Esquemas;
-using Microsoft.EntityFrameworkCore;
 using AutoMapper.QueryableExtensions;
+using Microsoft.EntityFrameworkCore;
 
 namespace AnhApi.Servicios
 {
@@ -14,7 +14,7 @@ namespace AnhApi.Servicios
         private readonly IMapper _mapper;
 
         public ServicioCategoriaActividad(
-            Datos.ContextoAppBD contexto, 
+            Datos.ContextoAppBD contexto,
             ILogger<ServicioCategoriaActividad> logger,
             IMapper mapper) : base(contexto, logger)
         {
@@ -35,7 +35,7 @@ namespace AnhApi.Servicios
 
                 return categorias;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _logger.LogError(ex, "Error al obtener el listado de Categorias ");
                 throw;
@@ -44,4 +44,3 @@ namespace AnhApi.Servicios
 
     }
 }
-    

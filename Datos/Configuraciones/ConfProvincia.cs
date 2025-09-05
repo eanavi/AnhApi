@@ -1,13 +1,14 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AnhApi.Modelos.prm; // Para el modelo Provincia
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using AnhApi.Modelos.prm; // Para el modelo Provincia
+
 namespace AnhApi.Datos.Configuraciones
 {
     public class ConfProvincia : IEntityTypeConfiguration<Provincia>
     {
         public void Configure(EntityTypeBuilder<Provincia> entity)
         {
-            entity.ToTable("provincia", "public"); 
+            entity.ToTable("provincia", "public");
 
             entity.HasKey(e => e.id_provincia)
                   .HasName("pk_id_provincia");

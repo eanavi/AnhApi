@@ -1,10 +1,10 @@
-﻿using AutoMapper;
-using AnhApi.Esquemas;
+﻿using AnhApi.Esquemas;
 using AnhApi.Modelos.prm;
+using AutoMapper;
 
 namespace AnhApi.Mapeos
 {
-    public class PerfilProvincia: Profile
+    public class PerfilProvincia : Profile
     {
         public PerfilProvincia()
         {

@@ -1,11 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using AnhApi.Esquemas;
-using Microsoft.AspNetCore.Authorization;
+﻿using AnhApi.Esquemas;
 using AnhApi.Interfaces;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace AnhApi.Controladores
 {
-
     [ApiController]
     [Route("api/auth")]
     public class AuthController : ControllerBase
@@ -22,7 +21,7 @@ namespace AnhApi.Controladores
 
 
         [HttpPost("login")]//Ruta completa api/auth/login
-        [ProducesResponseType(typeof(LoginResponse),StatusCodes.Status200OK)] //ok
+        [ProducesResponseType(typeof(LoginResponse), StatusCodes.Status200OK)] //ok
         [ProducesResponseType(StatusCodes.Status400BadRequest)] //Error (validacion de modelo)
         [ProducesResponseType(StatusCodes.Status401Unauthorized)] //No autorizado (credenciales ivalidas)
         [ProducesResponseType(StatusCodes.Status500InternalServerError)] //Error Interno de servidor
@@ -47,8 +46,8 @@ namespace AnhApi.Controladores
 
                 return Ok(response);
 
-            } 
-            catch(Exception ex)
+            }
+            catch (Exception ex)
             {
                 _logger.LogError(ex, "Error inesperado usuario '{request.Login}'");
                 return StatusCode(500, "Error interno");

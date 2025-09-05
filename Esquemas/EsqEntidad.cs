@@ -80,7 +80,7 @@ namespace AnhApi.Esquemas
     }
 
 
-    public class EntidadListadoDocumentos: EntidadListado
+    public class EntidadListadoDocumentos : EntidadListado
     {
         public ICollection<DocEntidadDespliegue> Documentos { get; set; } = new List<DocEntidadDespliegue>();
     }
@@ -110,7 +110,7 @@ namespace AnhApi.Esquemas
         public string AudIp { get; set; } = null!;
     }
 
-    public class EntidadConRep: EsqEntidad
+    public class EntidadConRep : EsqEntidad
     {
         public ICollection<Persona> Representantes { get; set; } = new List<Persona>();
     }

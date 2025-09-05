@@ -20,7 +20,7 @@ namespace AnhApi.Esquemas
         public string Clave { get; set; } = null!;
     }
 
-    public class UsuarioListado 
+    public class UsuarioListado
     {
         [Required]
         public long IdUsuario { get; set; }
