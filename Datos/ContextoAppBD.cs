@@ -35,6 +35,8 @@ namespace AnhApi.Datos
 
         public DbSet<CategoriaActividad> CategoriasActividad { get; set; }
 
+        public DbSet<Actividad> Actividades { get; set; }
+
         public DbSet<Organigrama> Organigramas { get; set; }
 
 

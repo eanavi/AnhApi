@@ -174,7 +174,7 @@ namespace AnhApi.Controladores
 
                 if (!resultado)
                 {
-                    _logger.LogInformation($"No se pudo actualizar la persona con Id {id}. podria no existir o no estar activa");
+                    _logger.LogInformation($"No se pudo actualizar la Entidad con Id {id}. podria no existir o no estar activa");
                     return NotFound($"Entidad con id {id} no encontrada o no se pudo actualizar");
                 }
 
@@ -182,7 +182,7 @@ namespace AnhApi.Controladores
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Error al actualizar la persona con ID {id}.");
+                _logger.LogError(ex, $"Error al actualizar la entidad con ID {id}.");
                 return StatusCode(500, $"Error interno del servidor al actualizar la Entidad con ID {id}");
             }
         }
